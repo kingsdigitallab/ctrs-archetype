@@ -1,0 +1,10 @@
+local_settings.py
+logs
+scriba/static
+/build
+django_cache
+/digipal_text
+/digipal
+*.py[cod]
+/scriba/search
+/scriba/backups
