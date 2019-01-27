@@ -10,10 +10,11 @@ The Lightbox is a separate project, even though it's still tightly linked to Dig
 >>> pip install git+https://github.com/Gbuomprisco/Digital-Lightbox.git
 By default, it is disabled. You can enable it by setting the variable LIGHTBOX in your settings:
 """
-LIGHTBOX = True
+LIGHTBOX = False
 
 # Mezzanine
-SITE_TITLE = 'SCRIBA'
+# SITE_TITLE = 'The community of the realm in Scotland'
+SITE_TITLE = 'CoTR - Archetype'
 
 # Social
 """
@@ -31,12 +32,12 @@ GITHUB = ''
 """
 If True, this setting will reject every change to the DB. To be used in production websites.
 """
-REJECT_HTTP_API_REQUESTS = False    # if True, prevents any change to the DB
+REJECT_HTTP_API_REQUESTS = False  # if True, prevents any change to the DB
 
 """
 This setting allows to set the number of zoom levels available in the OpenLayers layer.
 """
-ANNOTATOR_ZOOM_LEVELS = 7   # This setting sets the number of zoom levels of O
+ANNOTATOR_ZOOM_LEVELS = 7  # This setting sets the number of zoom levels of O
 
 FOOTER_LOGO_LINE = True
 
@@ -44,10 +45,9 @@ FOOTER_LOGO_LINE = True
 MODELS_PRIVATE = ['textcontentxml', 'itempart', 'image']
 MODELS_PUBLIC = MODELS_PRIVATE
 
-
 DEBUG_PERFORMANCE = False
 COMPRESS_ENABLED = True
-#COMPRESS_ENABLED = True
+# COMPRESS_ENABLED = True
 
 # from customisations.digipal.views.faceted_search.settings import FACETED_SEARCH
 
