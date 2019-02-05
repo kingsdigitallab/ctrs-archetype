@@ -8,6 +8,7 @@ https://github.com/kingsdigitallab/ctrs-django
 * python2, with pip and virtualenv
 * postgresql 9+
 * git
+* nodejs > npm > lessc, typescript
 
 # Local deployment
 
@@ -15,7 +16,7 @@ https://github.com/kingsdigitallab/ctrs-django
 
 ```
 cd AROOT # AROOT is the root path where you'll install archetype
-git clone git@github.com:kcl-ddh/digipal.git digipal_github # TODO: develop branch
+git clone -b develop git@github.com:kcl-ddh/digipal.git digipal_github
 git clone git@github.com:kingsdigitallab/ctrs-archetype.git
 ```
 
@@ -34,8 +35,7 @@ ln -s ../digipal_github/build
 cd AROOT
 python2 -m virtualenv venv
 . venv/bin/activate
-cd ctrs-archetype
-
+pip install -r ctrs-archetype/build/requirements.txt
 ```
 
 ## database
