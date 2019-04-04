@@ -2,8 +2,8 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from mezzanine.core.views import direct_to_template
 from django.contrib import admin
-# from customisations.digipal_text import models
-# from customisations.digipal_text.views import viewer
+from customisations.digipal_text import models
+from customisations.digipal_text.views import viewer
 # from exon.customisations.mapping import models
 
 admin.autodiscover()

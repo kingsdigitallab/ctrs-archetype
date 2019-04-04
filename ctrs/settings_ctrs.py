@@ -42,7 +42,7 @@ ANNOTATOR_ZOOM_LEVELS = 7  # This setting sets the number of zoom levels of O
 FOOTER_LOGO_LINE = True
 
 # Customise the faceted search settings
-MODELS_PRIVATE = ['textcontentxml', 'itempart', 'image']
+MODELS_PRIVATE = ['textcontentxml', 'itempart']
 MODELS_PUBLIC = MODELS_PRIVATE
 
 DEBUG_PERFORMANCE = False
@@ -58,37 +58,43 @@ KDL_MAINTAINED = True
 
 TEXT_EDITOR_OPTIONS_CUSTOM = {
     'buttons': {
-        'btnPersonName': {'label': 'Person name', 'tei': '<rs type="person" subtype="name">{}</rs>'},
-        'btnPersonMaritalStatus': {'label': 'Marital status', 'tei': '<rs type="person" subtype="marital-status">{}</rs>'},
-        'btnPerson': {'label': 'Person', 'buttons': ['btnPersonName', 'btnPersonMaritalStatus']},
+        'btnHead': {'label': 'Heading', 'tei': '<head>{}</head>'},
+        'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<head type="sub">{}</head>'},
+        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sb>{}</sb>'},
+        'btnStructure': {'label': 'Structure', 'buttons': ['btnChapterNumber', 'btnHead', 'btnSentenceNumber']},
 
-        'btnPlaceName': {'label': 'Place name', 'tei': '<rs type="place" subtype="name">{}</rs>'},
-        'btnBirthPlace': {'label': 'Birth place', 'tei': '<rs type="place" subtype="birthplace">{}</rs>'},
-        'btnResidence': {'label': 'Residence', 'tei': '<rs type="place" subtype="residence">{}</rs>'},
-        'btnPlace': {'label': 'Place', 'buttons': ['btnPlaceName', 'btnBirthPlace', 'btnResidence']},
-
-        'btnDate': {'label': 'Date', 'tei': '<rs type="date">{}</rs>'},
-        'btnOccupation': {'label': 'Occupation', 'tei': '<rs type="occupation">{}</rs>'},
-
-        'btnReligion': {'label': 'Religion', 'tei': '<rs type="religion">{}</rs>'},
-        'btnReligiousStatus': {'label': 'Religious status', 'tei': '<rs type="religious-status">{}</rs>'},
-
-        'btnJuridicalStatus': {'label': 'Juridical status', 'tei': '<rs type="juridical-status">{}</rs>'},
-        'btnInfrastructure': {'label': 'Infrastructure', 'tei': '<rs type="infrastructure">{}</rs>'},
-        'btnBuilding': {'label': 'Building', 'tei': '<rs type="building">{}</rs>'},
-        'btnLand': {'label': 'Land', 'tei': '<rs type="land">{}</rs>'},
-        'btnEconomicData': {'label': 'Economic Data', 'tei': '<rs type="economic-data">{}</rs>'},
-
-        'btnFurniture': {'label': 'Furniture', 'tei': '<rs type="item" subtype="furniture">{}</rs>'},
-        'btnClothing': {'label': 'Clothing', 'tei': '<rs type="item" subtype="clothing">{}</rs>'},
-        'btnFood': {'label': 'Food', 'tei': '<rs type="item" subtype="food">{}</rs>'},
-        'btnTool': {'label': 'Tool', 'tei': '<rs type="item" subtype="tool">{}</rs>'},
-        'btnWritingMaterial': {'label': 'Writing material', 'tei': '<rs type="item" subtype="writing-material">{}</rs>'},
-        'btnItem': {'label': 'Item', 'buttons': ['btnFurniture', 'btnClothing', 'btnFood', 'btnTool', 'btnWritingMaterial']},
+        #         'btnSegmentation': {'label': 'Head', 'tei': '<rs type="person" subtype="name">{}</rs>'},
+        #         'btnHead': {'label': 'Head', 'tei': '<rs type="person" subtype="name">{}</rs>'},
+        #         'btnPersonMaritalStatus': {'label': 'Marital status', 'tei': '<rs type="person" subtype="marital-status">{}</rs>'},
+        #         'btnPerson': {'label': 'Person', 'buttons': ['btnPersonName', 'btnPersonMaritalStatus']},
+        #
+        #         'btnPlaceName': {'label': 'Place name', 'tei': '<rs type="place" subtype="name">{}</rs>'},
+        #         'btnBirthPlace': {'label': 'Birth place', 'tei': '<rs type="place" subtype="birthplace">{}</rs>'},
+        #         'btnResidence': {'label': 'Residence', 'tei': '<rs type="place" subtype="residence">{}</rs>'},
+        #         'btnPlace': {'label': 'Place', 'buttons': ['btnPlaceName', 'btnBirthPlace', 'btnResidence']},
+        #
+        #         'btnDate': {'label': 'Date', 'tei': '<rs type="date">{}</rs>'},
+        #         'btnOccupation': {'label': 'Occupation', 'tei': '<rs type="occupation">{}</rs>'},
+        #
+        #         'btnReligion': {'label': 'Religion', 'tei': '<rs type="religion">{}</rs>'},
+        #         'btnReligiousStatus': {'label': 'Religious status', 'tei': '<rs type="religious-status">{}</rs>'},
+        #
+        #         'btnJuridicalStatus': {'label': 'Juridical status', 'tei': '<rs type="juridical-status">{}</rs>'},
+        #         'btnInfrastructure': {'label': 'Infrastructure', 'tei': '<rs type="infrastructure">{}</rs>'},
+        #         'btnBuilding': {'label': 'Building', 'tei': '<rs type="building">{}</rs>'},
+        #         'btnLand': {'label': 'Land', 'tei': '<rs type="land">{}</rs>'},
+        #         'btnEconomicData': {'label': 'Economic Data', 'tei': '<rs type="economic-data">{}</rs>'},
+        #
+        #         'btnFurniture': {'label': 'Furniture', 'tei': '<rs type="item" subtype="furniture">{}</rs>'},
+        #         'btnClothing': {'label': 'Clothing', 'tei': '<rs type="item" subtype="clothing">{}</rs>'},
+        #         'btnFood': {'label': 'Food', 'tei': '<rs type="item" subtype="food">{}</rs>'},
+        #         'btnTool': {'label': 'Tool', 'tei': '<rs type="item" subtype="tool">{}</rs>'},
+        #         'btnWritingMaterial': {'label': 'Writing material', 'tei': '<rs type="item" subtype="writing-material">{}</rs>'},
+        #         'btnItem': {'label': 'Item', 'buttons': ['btnFurniture', 'btnClothing', 'btnFood', 'btnTool', 'btnWritingMaterial']},
     },
     'show_highlights_in_preview': 1,
     'toolbars': {
-        'default': 'psclear undo redo pssave | btnPerson btnPlace btnDate btnOccupation btnReligion btnReligiousStatus | btnJuridicalStatus btnInfrastructure btnBuilding btnLand btnEconomicData btnItem | code ',
+        'default': 'psclear undo redo pssave | psconvert | btnStructure | code ',
     },
     'panels': {
         'north': {
