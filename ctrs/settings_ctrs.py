@@ -49,7 +49,7 @@ DEBUG_PERFORMANCE = False
 COMPRESS_ENABLED = True
 # COMPRESS_ENABLED = True
 
-# from customisations.digipal.views.faceted_search.settings import FACETED_SEARCH
+from customisations.digipal.views.faceted_search.settings import FACETED_SEARCH
 
 # CUSTOM_APPS = ['exon.customisations.mapping']
 
@@ -58,43 +58,42 @@ KDL_MAINTAINED = True
 
 TEXT_EDITOR_OPTIONS_CUSTOM = {
     'buttons': {
-        'btnHead': {'label': 'Heading', 'tei': '<head>{}</head>'},
-        'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<head type="sub">{}</head>'},
-        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sb>{}</sb>'},
-        'btnStructure': {'label': 'Structure', 'buttons': ['btnChapterNumber', 'btnHead', 'btnSentenceNumber']},
+        'btnHeading': {'label': 'Heading', 'tei': '<head>{}</head>', 'color': '#efffb0'},
+        'btnHeadingEmphasised': {'label': 'Heading (rubricated)', 'tei': '<head rend="emphasised">{}</head>'},
+        'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<cn>{}</cn>'},
+        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>'},
+        'btnPageNumber': {'label': 'Locus', 'tei': '<location loctype="locus">{}</location>'},
+        'btnStructure': {'label': 'Structure', 'buttons': [
+            'btnHeading', 'btnHeadingEmphasised', 'btnChapterNumber', 'btnSentenceNumber', 'btnPageNumber'
+        ]},
 
-        #         'btnSegmentation': {'label': 'Head', 'tei': '<rs type="person" subtype="name">{}</rs>'},
-        #         'btnHead': {'label': 'Head', 'tei': '<rs type="person" subtype="name">{}</rs>'},
-        #         'btnPersonMaritalStatus': {'label': 'Marital status', 'tei': '<rs type="person" subtype="marital-status">{}</rs>'},
-        #         'btnPerson': {'label': 'Person', 'buttons': ['btnPersonName', 'btnPersonMaritalStatus']},
-        #
-        #         'btnPlaceName': {'label': 'Place name', 'tei': '<rs type="place" subtype="name">{}</rs>'},
-        #         'btnBirthPlace': {'label': 'Birth place', 'tei': '<rs type="place" subtype="birthplace">{}</rs>'},
-        #         'btnResidence': {'label': 'Residence', 'tei': '<rs type="place" subtype="residence">{}</rs>'},
-        #         'btnPlace': {'label': 'Place', 'buttons': ['btnPlaceName', 'btnBirthPlace', 'btnResidence']},
-        #
-        #         'btnDate': {'label': 'Date', 'tei': '<rs type="date">{}</rs>'},
-        #         'btnOccupation': {'label': 'Occupation', 'tei': '<rs type="occupation">{}</rs>'},
-        #
-        #         'btnReligion': {'label': 'Religion', 'tei': '<rs type="religion">{}</rs>'},
-        #         'btnReligiousStatus': {'label': 'Religious status', 'tei': '<rs type="religious-status">{}</rs>'},
-        #
-        #         'btnJuridicalStatus': {'label': 'Juridical status', 'tei': '<rs type="juridical-status">{}</rs>'},
-        #         'btnInfrastructure': {'label': 'Infrastructure', 'tei': '<rs type="infrastructure">{}</rs>'},
-        #         'btnBuilding': {'label': 'Building', 'tei': '<rs type="building">{}</rs>'},
-        #         'btnLand': {'label': 'Land', 'tei': '<rs type="land">{}</rs>'},
-        #         'btnEconomicData': {'label': 'Economic Data', 'tei': '<rs type="economic-data">{}</rs>'},
-        #
-        #         'btnFurniture': {'label': 'Furniture', 'tei': '<rs type="item" subtype="furniture">{}</rs>'},
-        #         'btnClothing': {'label': 'Clothing', 'tei': '<rs type="item" subtype="clothing">{}</rs>'},
-        #         'btnFood': {'label': 'Food', 'tei': '<rs type="item" subtype="food">{}</rs>'},
-        #         'btnTool': {'label': 'Tool', 'tei': '<rs type="item" subtype="tool">{}</rs>'},
-        #         'btnWritingMaterial': {'label': 'Writing material', 'tei': '<rs type="item" subtype="writing-material">{}</rs>'},
-        #         'btnItem': {'label': 'Item', 'buttons': ['btnFurniture', 'btnClothing', 'btnFood', 'btnTool', 'btnWritingMaterial']},
+        'btnUnsettled': {'label': 'Unsettled (shared)', 'tei': '<seg type="unsettled">{}</seg>'},
+        'btnUnsettledUnique': {'label': 'Unsettled (unique)', 'tei': '<seg type="unsettled" subtype="unique">{}</seg>'},
+        'btnGenetic': {'label': 'Genetics', 'buttons': [
+            'btnUnsettled', 'btnUnsettledUnique'
+        ]},
+
+        'btnAddedAbove': {'label': 'Added (above)', 'tei': '<add place="above">{}</add>'},
+        'btnAddedInline': {'label': 'Added (inline)', 'tei': '<add place="inline">{}</add>'},
+        'btnDeletedStruck': {'label': 'Deleted (struck)', 'tei': '<del rend="strikethrough">{}</del>', 'plain': 1},
+        'btnDeletedErased': {'label': 'Deleted (erased)', 'tei': '<del rend="erased">{}</del>'},
+        'btnRedInk': {'label': 'Red Ink', 'tei': '<hi rend="color(ret)">{}</hi>', 'color': '#ffc9c9'},
+        'btnHighlighted': {'label': 'Highlighted', 'tei': '<hi rend="highlight">{}</hi>'},
+        'btnSuperscripted': {'label': 'Superscripted', 'tei': '<hi rend="sup">{}</hi>', 'plain': 1},
+        'btnScribal': {'label': 'Scribal Intervention', 'buttons': [
+            'btnAddedAbove', 'btnAddedInline', 'btnDeletedStruck', 'btnDeletedErased',
+            'btnRedInk', 'btnHighlighted', 'btnSuperscripted'
+        ]},
+
+        'btnVernacular': {'label': 'Vernacular', 'tei': '<seg lang="vernacular">{}</seg>', 'plain': 1},
+        'btnHandShift': {'label': 'New Hand', 'tei': '<newhand>{}</newhand>'},
+        'btnOther': {'label': 'Other', 'buttons': [
+            'btnVernacular', 'btnHandShift',
+        ]},
     },
     'show_highlights_in_preview': 1,
     'toolbars': {
-        'default': 'psclear undo redo pssave | psconvert | btnStructure | code ',
+        'default': 'psclear undo redo pssave | psconvert | btnStructure btnGenetic btnScribal btnOther | code ',
     },
     'panels': {
         'north': {

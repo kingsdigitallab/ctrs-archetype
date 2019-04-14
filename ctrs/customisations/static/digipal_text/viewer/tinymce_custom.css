@@ -16,6 +16,106 @@
             which can be combined (e.g. .highlight.multicolor )
 */
 
-.mce-content-body span[data-dpt=lb] {
-    content: '|';
+.mce-content-body span[data-dpt=sb],
+.preview.mce-content-body span[data-dpt=sb] {
+    background-color: #ffe7bc;
 }
+.mce-content-body span[data-dpt=sb]:before,
+.preview.mce-content-body span[data-dpt=sb]:before {
+    content: '';
+}
+
+.mce-content-body span[data-dpt=location][data-dpt-loctype=locus],
+.preview.mce-content-body span[data-dpt=location][data-dpt-loctype=locus]
+.mce-content-body span[data-dpt=sn],
+.preview.mce-content-body span[data-dpt=sn],
+.mce-content-body span[data-dpt=cn],
+.preview.mce-content-body span[data-dpt=cn] {
+    background-color: #ffe7bc;
+}
+
+.mce-content-body span[data-dpt=location][data-dpt-loctype=locus]:before,
+.preview.mce-content-body span[data-dpt=location][data-dpt-loctype=locus]:before,
+.mce-content-body span[data-dpt=sn]:before,
+.preview.mce-content-body span[data-dpt=sn]:before,
+.mce-content-body span[data-dpt=cn]:before,
+.preview.mce-content-body span[data-dpt=cn]:before,
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before,
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before
+{
+    content: '(';
+    display: inline;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    margin-top: inherit;
+    margin-left: inherit;
+    position: relative;
+    padding: inherit;
+    font-family: inherit;
+}
+
+.mce-content-body span[data-dpt=location][data-dpt-loctype=locus]:before,
+.preview.mce-content-body span[data-dpt=location][data-dpt-loctype=locus]:before {
+    content: '/f.';
+}
+.mce-content-body span[data-dpt=location]:after,
+.preview.mce-content-body span[data-dpt=location]:after {
+    content: '/';
+}
+
+.mce-content-body span[data-dpt=sn]:after,
+.preview.mce-content-body span[data-dpt=sn]:after {
+    display: inherit;
+    content: ')';
+}
+
+.mce-content-body span[data-dpt=cn]:before,
+.preview.mce-content-body span[data-dpt=cn]:before {
+    content: 'c. ';
+}
+.mce-content-body span[data-dpt=cn]:after,
+.preview.mce-content-body span[data-dpt=cn]:after {
+    content: '';
+}
+
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique],
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique] {
+    font-weight: bold;
+}
+
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique],
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique],
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled],
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled] {
+    background: none;
+    display: inline-block;
+    border: 2px solid grey;
+    padding: 0px 2px;
+}
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique]:before,
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique]:before,
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before,
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before,
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:after,
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:after {
+    content: '';
+}
+
+.mce-content-body span[data-dpt=hi][data-dpt-rend=sup],
+.preview.mce-content-body span[data-dpt=hi][data-dpt-rend=sup] {
+  vertical-align: super;
+  font-size: smaller;
+}
+.mce-content-body span[data-dpt=del][data-dpt-rend=strikethrough],
+.preview.mce-content-body span[data-dpt=del][data-dpt-rend=strikethrough] {
+  text-decoration: line-through;
+}
+.preview.mce-content-body span[data-dpt=del] {
+  display: inline;
+}
+.mce-content-body span[data-dpt-lang=vernacular],
+.preview.mce-content-body span[data-dpt-lang=vernacular] {
+  font-style: italic;
+}
+

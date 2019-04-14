@@ -22,12 +22,14 @@ urlpatterns = None
 #     url(r'^lab/collationdiagrams/$', 'collation_diagrams.view_collation_diagrams'),
 # )
 
-# dppatterns += patterns('exon.customisations.mapping',
-#                        url(r'^lab/map/$', 'views.view_map'))
+dppatterns = patterns(
+    'ctrs.customisations.digipal_text',
+    url(r'^digipal/versions/(?P<aid>[^/]+)/?$', 'views.genetics.view_versions')
+)
 
 # dppatterns += patterns('', ('^', include('digipal.urls')))
 
-dppatterns = patterns('', ('^', include('digipal.urls')))
+dppatterns += patterns('', ('^', include('digipal.urls')))
 
 if urlpatterns:
     urlpatterns += dppatterns
