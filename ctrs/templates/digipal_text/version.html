@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load html_escape mezzanine_tags  %}
+
+{% block meta_title %}{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    {% comment %}
+        Trick: TinyMCE will load this later dynamically
+        but that happens AFTER our resize calculate the height of the button bar
+        which is unstyled yet and therefore too tall and shrinks the iframe.
+        The solution is to force a load of the stylesheet here so the computation
+        is accurate.
+    {% endcomment %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}ctrs.css"/>
+{% endblock %}
+
+{% block main %}
+
+    <h1>{{ text.name }} - Unsettled texts</h1>
+
+    {% if 0 %}
+        <div class="row">
+            {% for tc in tcs %}
+                <div class="col-sm-2 regions">
+                    <div class="heading">
+                        {{ tc.ip.display_label }}
+                    </div>
+                    {% for region in tc.regions %}
+                        <div id="{{ region.id }}" title="{{ region.content }}"><input type="number">{{ region.content }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+        <div class="row">
+            <div class="col-sm-1 regions">
+                <div class="heading">
+                    &nbsp;
+                </div>
+                <div class="ed">
+                    {% for sn in slots %}
+                        <div >{{ sn }}<br></div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% for tc in tcs %}
+                <div class="col-sm-2 regions">
+                    <div class="heading">
+                        {{ tc.ip.display_label }}
+                    </div>
+                    <div class="ed">
+                        {% for region in tc.regions %}
+                            <div id="{{ region.id }}" title="{{ region.content }}">{{ region.content }}<br></div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script>
+        jQuery(document).ready(function($) {
+        });
+    </script>
+{% endblock %}
