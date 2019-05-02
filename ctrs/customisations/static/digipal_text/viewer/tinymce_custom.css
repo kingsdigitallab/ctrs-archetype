@@ -16,21 +16,14 @@
             which can be combined (e.g. .highlight.multicolor )
 */
 
-.mce-content-body span[data-dpt=sb],
-.preview.mce-content-body span[data-dpt=sb] {
-    background-color: #ffe7bc;
-}
 .mce-content-body span[data-dpt=sb]:before,
 .preview.mce-content-body span[data-dpt=sb]:before {
     content: '';
 }
 
-.mce-content-body span[data-dpt=location][data-dpt-loctype=locus],
-.preview.mce-content-body span[data-dpt=location][data-dpt-loctype=locus]
-.mce-content-body span[data-dpt=sn],
-.preview.mce-content-body span[data-dpt=sn],
-.mce-content-body span[data-dpt=cn],
-.preview.mce-content-body span[data-dpt=cn] {
+.mce-content-body span[data-dpt=sb]
+, .preview.mce-content-body span[data-dpt=sb]
+{
     background-color: #ffe7bc;
 }
 
@@ -106,6 +99,10 @@
 .preview.mce-content-body span[data-dpt=hi][data-dpt-rend=sup] {
   vertical-align: super;
   font-size: smaller;
+}
+.mce-content-body span[data-dpt=del][data-dpt-rend=erased],
+.preview.mce-content-body span[data-dpt=del][data-dpt-rend=erased] {
+  text-decoration: inherit;
 }
 .mce-content-body span[data-dpt=del][data-dpt-rend=strikethrough],
 .preview.mce-content-body span[data-dpt=del][data-dpt-rend=strikethrough] {

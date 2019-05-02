@@ -42,14 +42,12 @@ ANNOTATOR_ZOOM_LEVELS = 7  # This setting sets the number of zoom levels of O
 FOOTER_LOGO_LINE = True
 
 # Customise the faceted search settings
-MODELS_PRIVATE = ['textcontentxml', 'itempart']
+MODELS_PRIVATE = ['textcontentxml', 'itempart', 'text']
 MODELS_PUBLIC = MODELS_PRIVATE
 
 DEBUG_PERFORMANCE = False
 COMPRESS_ENABLED = True
 # COMPRESS_ENABLED = True
-
-from customisations.digipal.views.faceted_search.settings import FACETED_SEARCH
 
 # CUSTOM_APPS = ['exon.customisations.mapping']
 
@@ -60,9 +58,9 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
     'buttons': {
         'btnHeading': {'label': 'Heading', 'tei': '<head>{}</head>', 'color': '#efffb0'},
         'btnHeadingEmphasised': {'label': 'Heading (rubricated)', 'tei': '<head rend="emphasised">{}</head>'},
-        'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<cn>{}</cn>'},
-        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>'},
-        'btnPageNumber': {'label': 'Locus', 'tei': '<location loctype="locus">{}</location>'},
+        'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<cn>{}</cn>', 'color': '#ffe7bc'},
+        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>', 'color': '#ffe7bc'},
+        'btnPageNumber': {'label': 'Locus', 'tei': '<location loctype="locus">{}</location>', 'color': '#ffe7bc'},
         'btnStructure': {'label': 'Structure', 'buttons': [
             'btnHeading', 'btnHeadingEmphasised', 'btnChapterNumber', 'btnSentenceNumber', 'btnPageNumber'
         ]},
@@ -104,3 +102,38 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
         },
     }
 }
+
+CUSTOM_APPS = ['ctrs_text']
+
+
+from .customisations.digipal.views.faceted_search.settings import (
+    FACETED_SEARCH, FacettedType
+)
+
+texts = FacettedType.fromKey('texts')
+version_field = {
+    'key': 'version', 'label': 'Version',
+    'path': 'text_content.text.name',
+    'search': True, 'viewable': True, 'type': 'title',
+    'count': True,
+}
+texts.addField(version_field.copy(), 'url')
+filters = ['version', 'text_type']
+for f in texts.getFields():
+    if f['key'] not in filters:
+        f['count'] = False
+        f['filter'] = False
+
+
+texts.options['column_order'] = [
+    'url', 'version',  'repo_place', 'shelfmark', 'text_type'
+]
+
+texts.disableView('overview')
+
+manuscripts = FacettedType.fromKey('manuscripts')
+manuscripts.options['disabled'] = True
+# version_field['path'] = 'texts.name'
+# manuscripts.addField(version_field.copy())
+
+# FACETED_SEARCH[]

@@ -20,7 +20,7 @@ def TextContentXML_convert(self):
     # mark spans for deletion
     # exception: span with line-through
     if 1:
-        attribs_to_remove = set(['style', 'class', 'lang'])
+        attribs_to_remove = set(['style', 'class', 'lang', 'data-mce-style'])
 
         xml = dputils.get_xml_from_unicode(content, ishtml=True, add_root=True)
 
@@ -98,27 +98,46 @@ def TextContentXML_convert(self):
     )
 
     if 1:
-        # convert empty [] to [ - ]
-        empty_unsettled = '-'
+        def replace_unsettled_unique(amatch):
+            return replace_unsettled(amatch, 'unique')
 
-        content = re.sub(ur'\[\s*\]', ur'[{}]'.format(empty_unsettled), content)
+        def replace_unsettled(amatch, atype='shared'):
+            # convert empty [] to [ - ]
+            ret = amatch.group(1)
+            ret = ret.strip()
+            if ret in ['', '...']:
+                ret = '...'
+
+            print(ret)
+
+            subtype = 'data-dpt-subtype="{}"'.format(atype)
+
+            ret = ur'<span data-dpt="seg" data-dpt-type="unsettled" {}>{}</span>'.format(subtype, ret)
+
+            return ret
 
         # [] : unsettled text - unique
         content = re.sub(
+            ur'<strong>\[</strong>([^\[\]]*)<strong>\]</strong>',
+            ur'<strong>[\1]</strong>',
+            content
+        )
+        # [] : unsettled text - unique
+        content = re.sub(
             ur'<strong>\s*\[([^]<]*)\]\s*</strong>',
-            ur'<span data-dpt="seg" data-dpt-type="unsettled" data-dpt-subtype="unique">\1</span>',
+            replace_unsettled_unique,
             content
         )
         # [] : unsettled text - unique
         content = re.sub(
             ur'\[\s*<strong>([^]<]*)</strong>\s*\]',
-            ur'<span data-dpt="seg" data-dpt-type="unsettled" data-dpt-subtype="unique">\1</span>',
+            replace_unsettled_unique,
             content
         )
         # [] : unsettled text - shared
         content = re.sub(
             ur'\[([^]<]*)\]',
-            ur'<span data-dpt="seg" data-dpt-type="unsettled">\1</span>',
+            replace_unsettled,
             content
         )
 

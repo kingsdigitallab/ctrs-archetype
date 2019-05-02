@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n  blog_tags keyword_tags i18n html_escape %}
+
+{% block meta_title_site %}{{ settings.SITE_TITLE }}{% endblock %}
+
+{% block meta_title %}{% endblock %}
+
+{% block title %}
+    {% trans "Home" %}
+{% endblock %}
+
+{% block breadcrumb_menu %}
+    <li class="active">{% trans "Home" %}</li>
+{% endblock %}
+
+{% block main %}
+
+    {% render_mezzanine_page 'home.intro' %}
+
+    <a class="btn btn-default" href="/digipal/search/facets/">List of texts</a>
+
+{% endblock %}
