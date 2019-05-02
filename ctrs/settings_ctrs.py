@@ -3,13 +3,9 @@
 # PLEASE DO NOT PLACE ANY SENSITIVE DATA HERE (password, keys, personal
 # data, etc.)
 # Use local_settings.py for that purpose
+from .customisations.digipal.views.faceted_search.settings import FacettedType
 
 # Lightbox
-"""
-The Lightbox is a separate project, even though it's still tightly linked to Digipal. It is possible to install it through pip:
->>> pip install git+https://github.com/Gbuomprisco/Digital-Lightbox.git
-By default, it is disabled. You can enable it by setting the variable LIGHTBOX in your settings:
-"""
 LIGHTBOX = False
 
 # Mezzanine
@@ -105,10 +101,7 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
 
 CUSTOM_APPS = ['ctrs_text']
 
-
-from .customisations.digipal.views.faceted_search.settings import (
-    FACETED_SEARCH, FacettedType
-)
+# FACETED SEARCH
 
 texts = FacettedType.fromKey('texts')
 version_field = {
@@ -133,7 +126,3 @@ texts.disableView('overview')
 
 manuscripts = FacettedType.fromKey('manuscripts')
 manuscripts.options['disabled'] = True
-# version_field['path'] = 'texts.name'
-# manuscripts.addField(version_field.copy())
-
-# FACETED_SEARCH[]

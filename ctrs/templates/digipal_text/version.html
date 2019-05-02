@@ -1,30 +1,28 @@
 {% extends "base.html" %}
 {% load html_escape mezzanine_tags  %}
 
-{% block meta_title %}{% endblock %}
+{% block meta_title %}{{ text.name }}{% endblock %}
 
 {% block extra_css %}
     {{ block.super }}
-    {% comment %}
-        Trick: TinyMCE will load this later dynamically
-        but that happens AFTER our resize calculate the height of the button bar
-        which is unstyled yet and therefore too tall and shrinks the iframe.
-        The solution is to force a load of the stylesheet here so the computation
-        is accurate.
-    {% endcomment %}
     <link rel="stylesheet" href="{{ STATIC_URL }}ctrs.css"/>
 {% endblock %}
 
 {% block main %}
 
-    <h1>{{ text.name }} - Unsettled texts</h1>
+    <h1>{{ text.name }} - V-Unsettled regions
+        <span>
+            - {{ this_type }}s
+            <a class="dp-small" href="?type={{ other_type }}">(see {{ other_type }}s)</a>
+        </span>
+    </h1>
 
     {% if 0 %}
         <div class="row">
             {% for tc in tcs %}
                 <div class="col-sm-2 regions">
                     <div class="heading">
-                        {{ tc.ip.display_label }}
+                        <a href="{{ tc.ip.get_absolute_url }}texts/view/">{{ tc.ip.display_label }}</a>
                     </div>
                     {% for region in tc.regions %}
                         <div id="{{ region.id }}" title="{{ region.content }}"><input type="number">{{ region.content }}</div>
@@ -34,7 +32,8 @@
         </div>
     {% endif %}
 
-        <div class="row">
+    <div class="row">
+        {% if show_numbers %}
             <div class="col-sm-1 regions">
                 <div class="heading">
                     &nbsp;
@@ -45,19 +44,20 @@
                     {% endfor %}
                 </div>
             </div>
-            {% for tc in tcs %}
-                <div class="col-sm-2 regions">
-                    <div class="heading">
-                        {{ tc.ip.display_label }}
-                    </div>
-                    <div class="ed">
-                        {% for region in tc.regions %}
-                            <div id="{{ region.id }}" title="{{ region.content }}">{{ region.content }}<br></div>
-                        {% endfor %}
-                    </div>
+        {% endif %}
+        {% for tc in tcs %}
+            <div class="col-sm-2 regions">
+                <div class="heading">
+                    <a href="{{ tc.ip.get_absolute_url }}texts/view/">{{ tc.ip.display_label }}</a>
                 </div>
-            {% endfor %}
-        </div>
+                <div class="ed">
+                    {% for region in tc.regions %}
+                        <div id="{{ region.id }}" title="{{ region.content }}">{{ region.content }}<br></div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock %}
 

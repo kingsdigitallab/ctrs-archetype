@@ -1,4 +1,5 @@
-.regions div.heading {
+.regions div.heading,
+.regions div.heading a {
     height: 8rem;
     background-color: #4c5e69;
     color: white;

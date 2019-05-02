@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from digipal.models import Text
-from digipal_text.models import TextContentXML
+from digipal_text.models import TextContentXML, TextContentType
 from digipal import utils as dputils
 
 
@@ -14,7 +14,21 @@ def view_versions(request, aid=None):
     context['tcs'] = []
     slots_count = 0
 
-    for tcx in TextContentXML.objects.filter(text_content__text=text):
+    atypes = TextContentType.objects.all().order_by('id')
+
+    default_type = atypes[0].slug
+    atype = request.GET.get('type', default_type)
+    other_type = atypes[1].slug
+    if atype == other_type:
+        other_type = default_type
+    context['other_type'] = other_type
+    context['this_type'] = atype
+
+    # text content xmls
+    tcxs = TextContentXML.objects.filter(
+        text_content__text=text, text_content__type__slug=atype
+    ).order_by('text_content__item_part__display_label')
+    for tcx in tcxs:
         tcx.save_with_element_ids()
         content = tcx.content
 
@@ -37,6 +51,6 @@ def view_versions(request, aid=None):
         1, 1 + max([len(tc['regions']) for tc in context['tcs']])
     )
 
-    print(context)
+    context['show_numbers'] = 0
 
     return render(request, 'digipal_text/version.html', context)
