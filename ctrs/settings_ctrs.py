@@ -63,7 +63,7 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
 
         'btnUnsettled': {'label': 'Unsettled (shared)', 'tei': '<seg type="unsettled">{}</seg>'},
         'btnUnsettledUnique': {'label': 'Unsettled (unique)', 'tei': '<seg type="unsettled" subtype="unique">{}</seg>'},
-        'btnGenetic': {'label': 'Genetics', 'buttons': [
+        'btnGenetic': {'label': 'Dynamics', 'buttons': [
             'btnUnsettled', 'btnUnsettledUnique'
         ]},
 
