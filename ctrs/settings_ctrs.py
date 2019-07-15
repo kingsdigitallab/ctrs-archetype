@@ -71,11 +71,13 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
         'btnAddedInline': {'label': 'Added (inline)', 'tei': '<add place="inline">{}</add>'},
         'btnDeletedStruck': {'label': 'Deleted (struck)', 'tei': '<del rend="strikethrough">{}</del>', 'plain': 1},
         'btnDeletedErased': {'label': 'Deleted (erased)', 'tei': '<del rend="erased">{}</del>'},
+        'btnDeletedUnderpointed': {'label': 'Deleted (underpointed)', 'tei': '<del rend="underpointed">{}</del>'},
         'btnRedInk': {'label': 'Red Ink', 'tei': '<hi rend="color(ret)">{}</hi>', 'color': '#ffc9c9'},
         'btnHighlighted': {'label': 'Highlighted', 'tei': '<hi rend="highlight">{}</hi>'},
         'btnSuperscripted': {'label': 'Superscripted', 'tei': '<hi rend="sup">{}</hi>', 'plain': 1},
         'btnScribal': {'label': 'Scribal Intervention', 'buttons': [
-            'btnAddedAbove', 'btnAddedInline', 'btnDeletedStruck', 'btnDeletedErased',
+            'btnAddedAbove', 'btnAddedInline',
+            'btnDeletedStruck', 'btnDeletedErased', 'btnDeletedUnderpointed',
             'btnRedInk', 'btnHighlighted', 'btnSuperscripted'
         ]},
 
@@ -126,3 +128,12 @@ texts.disableView('overview')
 
 manuscripts = FacettedType.fromKey('manuscripts')
 manuscripts.options['disabled'] = True
+
+# Regiam / Declaration
+text_work_field = {
+    'key': 'text_work', 'label': 'Work',
+    'path': 'get_work_label', 'type': 'title', 'search': True,
+    'count': True
+}
+
+texts.addField(text_work_field.copy(), 'url')

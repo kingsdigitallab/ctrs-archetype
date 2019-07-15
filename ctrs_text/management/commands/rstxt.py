@@ -28,43 +28,7 @@ Commands:
         Insert/Update CI, IP & Text records from a CSV file
         (work, context, )
 
-    email
-
-    validate
-
-    record_path
-        Test the field extraction from record + path used by the faceted search module
-        e.g. record_path manuscripts historical_item.historical_item_type.name 598
-
-    dateconv [hi [HI_ID]]
-        reports datse which cannot be parsed correctly
-        if hi: check hi.get_date_sort() otherwise check dateevidence.date
-
-    max_date_range FIELD
-        e.g. max_date_range HistoricalItem.date
-        returns the minimum and maximum of the date values among all HistoricalItem records
-
-    date_prob
-        report all HI dates with a very wide range (unrecognised, or open ended range)
-
-    cs
-        TODO
-        collect static
-
-    cpip REQ1 REQ2
-        compare two PIP req files (pip freeze)
-
-    download_images URL
-        URL: e.g. "http://domain/path/to/image_{001_r,003_v}.jpg"
-
-    unstatic
-        Opposite of collectstatics
-        It removes the copies of the assets
-        This is only for dev env. when you are changing the js/css, ...
-        Note that transpiled code can't be made dynamic (e.g. less, ts)
-
-    jsdates
-        test date conversion during json parsing
+    drop
 """
 
     args = 'locus|email'
@@ -123,10 +87,20 @@ Commands:
             m.objects.all().delete()
 
     def import_text_meta(self):
+        '''
+        Read CSV file and Insert or update records in the database.
+
+        CurrentItem - sheflmark, archive
+        ItemPart - locus, CI
+        Text - context OR 'WORK, version VERSION'
+        TextContent - IP, translation & IP, transcription
+        TextContentXML - TC
+        '''
         type_tsl, _ = TextContentType.objects.get_or_create(name='Translation')
         type_tsc, _ = TextContentType.objects.get_or_create(
             name='Transcription'
         )
+        ci_ids = CurrentItem.objects.all().values_list('id', flat=True)
         for row in read_all_lines_from_csv(self.args[0]):
             '''
             u'context': u'John Haldenstone',
@@ -138,17 +112,31 @@ Commands:
             '''
             print(row['shelfmark'], row['archive'])
             ci = CurrentItem.get_or_create(row['shelfmark'], row['archive'])
+            if ci.id not in ci_ids:
+                print(' new CI')
             if ci is None:
                 print('WARNING: invalid inputs')
             else:
                 options = dict(locus=row['locus'], current_item=ci)
                 ip, c = ItemPart.objects.get_or_create(**options)
-                text, c = Text.objects.get_or_create(name=row['context'])
+                if c:
+                    print(' new IP')
+                version_name = row['context']
+                if not version_name:
+                    version_name = '{}, version {}'.format(
+                        row['work'], row['versionnumber']
+                    )
+                print(version_name)
+                text, c = Text.objects.get_or_create(name=version_name)
+                if c:
+                    print(' new Text')
                 for t in [type_tsl, type_tsc]:
                     tc, c = TextContent.objects.get_or_create(
                         item_part=ip, type=t
                     )
                     if c:
+                        if c:
+                            print(' new TC')
                         tc.text = text
                         tc.save()
                         tcx, c = TextContentXML.objects.get_or_create(

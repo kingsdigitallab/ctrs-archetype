@@ -183,3 +183,13 @@ def TextContentXML_save_with_element_ids(self, *args, **kwargs):
 
 
 TextContentXML.save_with_element_ids = TextContentXML_save_with_element_ids
+
+
+def TextContentXML_get_work_label(self):
+    ret = 'Declaration'
+    if 'regiam' in self.text_content.text.name.lower():
+        ret = 'Regiam'
+    return ret
+
+
+TextContentXML.get_work_label = TextContentXML_get_work_label
