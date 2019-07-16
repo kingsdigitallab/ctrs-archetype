@@ -199,9 +199,10 @@ def TextContentXML_get_state(self):
     ret = 'Empty'
     content = (self.content or '').strip()
     if len(content) > 20:
-        ret = 'Draft'
-        if 'unsettled' in content:
-            ret = 'Encoded'
+        ret = self.status.name
+        if self.status.slug == 'draft':
+            if 'unsettled' not in content:
+                ret += ' (not encoded)'
     return ret
 
 
