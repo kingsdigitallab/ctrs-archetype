@@ -137,3 +137,13 @@ text_work_field = {
 }
 
 texts.addField(text_work_field.copy(), 'url')
+
+# Regiam / Declaration
+text_state = {
+    'key': 'text_state', 'label': 'State',
+    'path': 'get_state', 'type': 'title', 'search': False,
+    'count': True, 'viewable': True,
+}
+
+texts.addField(text_state.copy())
+texts.getOption('column_order').append('text_state')

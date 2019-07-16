@@ -193,3 +193,16 @@ def TextContentXML_get_work_label(self):
 
 
 TextContentXML.get_work_label = TextContentXML_get_work_label
+
+
+def TextContentXML_get_state(self):
+    ret = 'Empty'
+    content = (self.content or '').strip()
+    if len(content) > 20:
+        ret = 'Draft'
+        if 'unsettled' in content:
+            ret = 'Encoded'
+    return ret
+
+
+TextContentXML.get_state = TextContentXML_get_state
