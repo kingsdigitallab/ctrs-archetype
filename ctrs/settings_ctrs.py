@@ -61,10 +61,11 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
             'btnHeading', 'btnHeadingEmphasised', 'btnChapterNumber', 'btnSentenceNumber', 'btnPageNumber'
         ]},
 
-        'btnUnsettled': {'label': 'Unsettled (shared)', 'tei': '<seg type="unsettled">{}</seg>'},
-        'btnUnsettledUnique': {'label': 'Unsettled (unique)', 'tei': '<seg type="unsettled" subtype="unique">{}</seg>'},
+        'btnUnsettled': {'label': 'V-Unsettled (shared)', 'tei': '<seg type="unsettled">{}</seg>'},
+        'btnUnsettledUnique': {'label': 'V-Unsettled (unique)', 'tei': '<seg type="unsettled" subtype="unique">{}</seg>'},
+        'btnWUnsettled': {'label': 'W-Unsettled (shared)', 'tei': '<seg type="unsettled" group="work">{}</seg>'},
         'btnGenetic': {'label': 'Dynamics', 'buttons': [
-            'btnUnsettled', 'btnUnsettledUnique'
+            'btnUnsettled', 'btnUnsettledUnique', 'btnWUnsettled'
         ]},
 
         'btnAddedAbove': {'label': 'Added (above)', 'tei': '<add place="above">{}</add>'},

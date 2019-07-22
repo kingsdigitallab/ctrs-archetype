@@ -145,3 +145,7 @@ Commands:
                         if c:
                             tcx.content = '<p>Empty</p>'
                             tcx.save()
+
+                # create a version text
+
+                # create the work text

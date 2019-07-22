@@ -3,10 +3,6 @@
     Within the Text Editor panels
     Or in the search results
 
-    LEAVE THIS FILE EMPTY.
-    COPY IT IN YOUR PROJECT'S STATIC FOLDER TO PROVIDE YOUR PROJECT
-    SPECIFIC STYLES.
-
     See tinymce.css for more general classes you can inherit from.
 
     Classes:
@@ -80,12 +76,37 @@
 .mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique],
 .preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique],
 .mce-content-body span[data-dpt=seg][data-dpt-type=unsettled],
-.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled] {
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled],
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work],
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work]
+{
     background: none;
     display: inline-block;
     border: 2px solid grey;
     padding: 0px 2px;
 }
+
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work],
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work] {
+  border: 2px solid #fd6c23;
+  padding: 2px 1em;
+}
+
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work]:before,
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work]:before {
+    content: 'W';
+    position: absolute;
+    margin-top: -1.1em;
+    color: #fd6c23;
+    background: white;
+    font-family: "Arial Black",Gadget,sans-serif;
+    font-size: 78%;
+    line-height: 1em;
+    padding: 0;
+    margin-left: -1em;
+}
+
+
 .mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique]:before,
 .preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique]:before,
 .mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before,
