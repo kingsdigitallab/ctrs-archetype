@@ -9,7 +9,7 @@ import subprocess
 import re
 from optparse import make_option
 from django.db import IntegrityError
-from digipal.models import *
+from digipal.models import ItemPartType, ItemPart, CurrentItem, Text
 from digipal.utils import natural_sort_key, read_all_lines_from_csv
 from digipal.templatetags.hand_filters import chrono
 from django.template.defaultfilters import slugify
@@ -96,12 +96,71 @@ Commands:
         TextContent - IP, translation & IP, transcription
         TextContentXML - TC
         '''
-        type_tsl, _ = TextContentType.objects.get_or_create(name='Translation')
-        type_tsc, _ = TextContentType.objects.get_or_create(
-            name='Transcription'
-        )
+
+        tc_types = {
+            slugify(name): TextContentType.objects.get_or_create(name=name)[0]
+            for name
+            in ['Transcription', 'Translation']
+        }
         ci_ids = CurrentItem.objects.all().values_list('id', flat=True)
+
+        ip_types = {
+            slugify(name): ItemPartType.objects.get_or_create(name=name)[0]
+            for name
+            in ['Manuscript', 'Version', 'Work']
+        }
+
+        #
+        for tc in TextContent.objects.all():
+            tc.text = None
+            tc.save()
+
+        # a special CI for all versions and works
+        ci_cotr = CurrentItem.get_or_create('Editions', 'COTR, Database')
+        ip_works = {}
+        ip_versions = {}
+
         for row in read_all_lines_from_csv(self.args[0]):
+
+            # create the work
+            work_name = row['work']
+
+            ip_work = ip_works.get(slugify(work_name), None)
+            if not ip_work:
+                ip_work = self.get_or_create_ip_and_textcontents(
+                    ci_cotr, {
+                        'custom_label': work_name
+                    },
+                    tc_types
+                )
+                ip_work.type = ip_types['work']
+                ip_work.save()
+                ip_works[slugify(work_name)] = ip_work
+
+            # create the version
+            version_name = row['context']
+            if not version_name:
+                version_name = '{}, version {}'.format(
+                    row['work'], row['versionnumber']
+                )
+            print(version_name)
+
+            ip_version = ip_versions.get(version_name, None)
+
+            if not ip_version:
+                ip_version = self.get_or_create_ip_and_textcontents(
+                    ci_cotr, {
+                        'custom_label': version_name
+                    },
+                    tc_types
+                )
+                ip_version.type = ip_types['version']
+                ip_version.group = ip_work
+                ip_version.save()
+                ip_versions[slugify(version_name)] = ip_version
+
+            # create MS-text
+
             '''
             u'context': u'John Haldenstone',
             u'work': u'Declaration',
@@ -111,41 +170,50 @@ Commands:
             '_line_index': 26
             '''
             print(row['shelfmark'], row['archive'])
+
             ci = CurrentItem.get_or_create(row['shelfmark'], row['archive'])
             if ci.id not in ci_ids:
                 print(' new CI')
             if ci is None:
                 print('WARNING: invalid inputs')
             else:
-                options = dict(locus=row['locus'], current_item=ci)
-                ip, c = ItemPart.objects.get_or_create(**options)
-                if c:
-                    print(' new IP')
-                version_name = row['context']
-                if not version_name:
-                    version_name = '{}, version {}'.format(
-                        row['work'], row['versionnumber']
-                    )
-                print(version_name)
-                text, c = Text.objects.get_or_create(name=version_name)
-                if c:
-                    print(' new Text')
-                for t in [type_tsl, type_tsc]:
-                    tc, c = TextContent.objects.get_or_create(
-                        item_part=ip, type=t
-                    )
-                    if c:
-                        if c:
-                            print(' new TC')
-                        tc.text = text
-                        tc.save()
-                        tcx, c = TextContentXML.objects.get_or_create(
-                            text_content=tc
-                        )
-                        if c:
-                            tcx.content = '<p>Empty</p>'
-                            tcx.save()
+                ip = self.get_or_create_ip_and_textcontents(
+                    ci, {
+                        'locus': row['locus']
+                    },
+                    tc_types
+                )
+                ip.type = ip_types['manuscript']
+                ip.group = ip_version
+                ip.save()
 
-                # create a version text
+    def get_or_create_ip_and_textcontents(
+        self, ci, ip_options, tc_types, version_name=None,
+    ):
+        ip_options['current_item'] = ci
+        ip, c = ItemPart.objects.get_or_create(**ip_options)
+        if c:
+            print(' new IP')
+        text = None
+        if version_name:
+            text, c = Text.objects.get_or_create(name=version_name)
+            if c:
+                print(' new Text')
+        for tc_type in tc_types.values():
+            tc, c = TextContent.objects.get_or_create(
+                item_part=ip, type=tc_type
+            )
+            if c:
+                if c:
+                    print(' new TC')
+                if text:
+                    tc.text = text
+                tc.save()
+                tcx, c = TextContentXML.objects.get_or_create(
+                    text_content=tc
+                )
+                if c:
+                    tcx.content = '<p>Empty</p>'
+                    tcx.save()
 
-                # create the work text
+        return ip

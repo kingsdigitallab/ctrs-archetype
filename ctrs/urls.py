@@ -24,7 +24,8 @@ urlpatterns = None
 
 dppatterns = patterns(
     'ctrs.customisations.digipal_text',
-    url(r'^digipal/versions/(?P<aid>[^/]+)/?$', 'views.genetics.view_versions')
+    url(r'^digipal/versions/(?P<ip_group_id>[^/]+)/?$',
+        'views.genetics.view_versions')
 )
 
 # dppatterns += patterns('', ('^', include('digipal.urls')))

@@ -1,16 +1,16 @@
 from django.shortcuts import render
-from digipal.models import Text
+from digipal.models import Text, ItemPart
 from digipal_text.models import TextContentXML, TextContentType
 from digipal import utils as dputils
 
 
-def view_versions(request, aid=None):
+def view_versions(request, ip_group_id=None):
     context = {
         'wide_page': True,
     }
 
-    text = Text.objects.filter(id=aid).first()
-    context['text'] = text
+    ip_group = ItemPart.objects.filter(id=ip_group_id).first()
+    context['ip_group'] = ip_group
     context['tcs'] = []
     slots_count = 0
 
@@ -26,9 +26,12 @@ def view_versions(request, aid=None):
 
     # text content xmls
     tcxs = TextContentXML.objects.filter(
-        text_content__text=text, text_content__type__slug=atype
+        text_content__item_part__group=ip_group, text_content__type__slug=atype
     ).order_by('text_content__item_part__display_label')
-    for tcx in tcxs:
+    ip_group_tcxs = TextContentXML.objects.filter(
+        text_content__item_part=ip_group, text_content__type__slug=atype
+    ).order_by('text_content__item_part__display_label')
+    for tcx in list(ip_group_tcxs) + list(tcxs):
         tcx.save_with_element_ids()
         content = tcx.content
 

@@ -1,7 +1,7 @@
 {% extends "digipal_text/text_viewer_base.html" %}
 
 {% block viewer-title-extra %}
-    {% with item_part.text_contents.first.text as atext %}
-        (<a href="/digipal/versions/{{atext.pk}}/">{{ atext.name }}</a>)
+    {% with item_part.group as group %}
+        (<a href="/digipal/versions/{{group.pk}}/">{{ group }}</a>)
     {% endwith %}
 {% endblock %}

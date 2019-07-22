@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load html_escape mezzanine_tags  %}
 
-{% block meta_title %}{{ text.name }}{% endblock %}
+{% block meta_title %}{{ ip_group }}{% endblock %}
 
 {% block extra_css %}
     {{ block.super }}
@@ -10,7 +10,7 @@
 
 {% block main %}
 
-    <h1>{{ text.name }} - V-Unsettled regions
+    <h1>{{ ip_group }} - Unsettled regions
         <span>
             - {{ this_type }}s
             <a class="dp-small" href="?type={{ other_type }}">(see {{ other_type }}s)</a>

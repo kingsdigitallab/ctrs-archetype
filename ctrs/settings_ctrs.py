@@ -109,42 +109,55 @@ CUSTOM_APPS = ['ctrs_text']
 texts = FacettedType.fromKey('texts')
 version_field = {
     'key': 'version', 'label': 'Version',
-    'path': 'text_content.text.name',
+    'path': 'get_version_label',
     'search': True, 'viewable': True, 'type': 'title',
     'count': True,
 }
 texts.addField(version_field.copy(), 'url')
-filters = ['version', 'text_type']
-for f in texts.getFields():
-    if f['key'] not in filters:
-        f['count'] = False
-        f['filter'] = False
 
-
-texts.options['column_order'] = [
-    'url', 'version',  'repo_place', 'shelfmark', 'text_type'
-]
-
-texts.disableView('overview')
-
-manuscripts = FacettedType.fromKey('manuscripts')
-manuscripts.options['disabled'] = True
+ip_display_label = {
+    'key': 'text_name', 'label': 'Text',
+    'path': 'text_content.item_part.display_label',
+    'search': True, 'viewable': True, 'type': 'title',
+    'count': False,
+}
+texts.addField(ip_display_label.copy(), 'url')
 
 # Regiam / Declaration
 text_work_field = {
     'key': 'text_work', 'label': 'Work',
     'path': 'get_work_label', 'type': 'title', 'search': True,
-    'count': True
+    'count': True, 'viewable': True
 }
-
 texts.addField(text_work_field.copy(), 'url')
 
 # Regiam / Declaration
 text_state = {
-    'key': 'text_state', 'label': 'State',
+    'key': 'text_state', 'label': 'Status',
     'path': 'get_state', 'type': 'title', 'search': False,
     'count': True, 'viewable': True,
 }
-
 texts.addField(text_state.copy())
-texts.getOption('column_order').append('text_state')
+
+texts.disableView('overview')
+# filters = ['version', 'text_type']
+# for f in texts.getFields():
+#     if f['key'] not in filters:
+#         f['count'] = False
+#         f['filter'] = False
+
+texts.options['filter_order'] = [
+    'text_work', 'version', 'text_type', 'text_state'
+]
+
+texts.options['column_order'] = [
+    'url', 'text_work', 'version',  'text_name', 'text_type', 'text_state'
+]
+
+texts.options['sorted_fields'] = [
+    'text_work', 'version', 'text_name', 'text_type'
+]
+
+#
+manuscripts = FacettedType.fromKey('manuscripts')
+manuscripts.options['disabled'] = True

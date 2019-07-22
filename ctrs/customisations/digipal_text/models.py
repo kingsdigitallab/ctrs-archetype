@@ -185,10 +185,37 @@ def TextContentXML_save_with_element_ids(self, *args, **kwargs):
 TextContentXML.save_with_element_ids = TextContentXML_save_with_element_ids
 
 
+def TextContentXML_get_version_label(self):
+    ret = u'?'
+    ip = self.text_content.item_part
+    if ip and ip.type:
+        if ip.type.name == u'Work':
+            ret = u'WORK'
+        if ip.type.name == u'Version':
+            ret = ip.custom_label
+        if ip.type.name == u'Manuscript':
+            if ip.group:
+                ret = ip.group.custom_label
+
+    return ret
+
+
+TextContentXML.get_version_label = TextContentXML_get_version_label
+
+
 def TextContentXML_get_work_label(self):
-    ret = 'Declaration'
-    if 'regiam' in self.text_content.text.name.lower():
-        ret = 'Regiam'
+    ret = u'?'
+    ip = self.text_content.item_part
+    if ip and ip.type:
+        if ip.type.name == u'Work':
+            ret = ip.custom_label
+        if ip.type.name == u'Version':
+            if ip.group:
+                ret = ip.group.custom_label
+        if ip.type.name == u'Manuscript':
+            if ip.group and ip.group.group:
+                ret = ip.group.group.custom_label
+
     return ret
 
 
