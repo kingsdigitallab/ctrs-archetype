@@ -104,3 +104,19 @@ if 1:
 
     if resolve_default_location_base != resolve_default_location:
         viewer.resolve_default_location = resolve_default_location
+
+    #
+    base_get_all_master_locations = viewer.get_all_master_locations
+
+    def viewer_get_all_master_locations(context):
+        res = base_get_all_master_locations(context)
+
+        # let's add 'whole' as the first option
+        ret = OrderedDict()
+
+        ret['locus'] = ['face']
+        ret['whole'] = ['whole']
+
+        return ret
+
+    viewer.get_all_master_locations = viewer_get_all_master_locations
