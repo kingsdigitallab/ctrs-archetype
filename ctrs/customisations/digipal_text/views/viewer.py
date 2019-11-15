@@ -115,7 +115,7 @@ if 1:
         ret = OrderedDict()
 
         ret['locus'] = ['face']
-        ret['whole'] = ['whole']
+        # ret['whole'] = ['whole']
 
         return ret
 
