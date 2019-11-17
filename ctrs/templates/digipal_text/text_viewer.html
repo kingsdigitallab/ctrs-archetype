@@ -1,7 +1,80 @@
 {% extends "digipal_text/text_viewer_base.html" %}
 
 {% block viewer-title-extra %}
+    -
     {% with item_part.group as group %}
-        (<a href="/digipal/versions/{{group.pk}}/">{{ group }}</a>)
+        {% if group %}
+          [<a href="/digipal/versions/{{group.pk}}/">{{ group }}</a>]
+        {% else %}
+          [<a href="/digipal/versions/{{item_part.pk}}/">{{ item_part }}</a>]
+        {% endif %}
     {% endwith %}
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script>
+        jQuery(document).ready(function($) {
+          // GN: patch for CTRS unsettled regions to appear in the
+          // Image pane of the Text Editor.
+
+          var TextViewer = window.TextViewer;
+
+          TextViewer.get_sublocation_from_element = function(element) {
+              // returns a sub location array from a html element
+              // <span data-dpt='location' data-dpt-loctype="entry">1a1</span>
+              // => [['', 'location'], ['loctype', 'entry'], ['@text', '1a1']]
+
+              console.log('get_sublocation_from_element PATCHED')
+
+              var ret = [];
+              var $el = $(element).closest('[data-dpt]');
+              if ($el.length) {
+                  // convert attributes
+                  ret = $.map($el[0].attributes, function(val, i) {
+                      var name = val.name.replace(/^data-dpt-?/, '');
+                      // CTRS - PATCH 1
+                      if (name != val.name && name !== 'cat' && name != 'subtype') return [[name, val.value]];
+                  });
+                  // filter: we don't want ANY element (e.g. clause: ok, exp/abbr: no)
+                  if (ret.length > 0) {
+                      // CTRS - PATCH 2
+                      var accepted_tags = ['seg'];
+                      if (accepted_tags.indexOf(ret[0][1]) < 0) {
+                          ret = [];
+                      }
+                  }
+                  // add slugified small text content
+                  if (ret.length > 0) {
+                      var text = TextViewer.slugify($el.text());
+                      // CTRS - PATCH 3
+                      if (text.length > 0) {
+                          ret.push(['@text', text.substring(0, 20)]);
+                      }
+                  }
+
+                  // find out the occurrence number. e.g. ['@o', '2'] for second occurrence.
+                  if (1) {
+                      var order = 0;
+
+                      var selectorInfo = TextViewer.getSelectorFromSublocation(ret);
+                      $el.parents('.panel-content').find(selectorInfo.selector).each(function() {
+                          var $oel = $(this);
+                          if (!selectorInfo.text || (TextViewer.slugify($oel.text()) == selectorInfo.text)) {
+                              order += 1;
+                          }
+                          if ($oel[0] === $el[0]) return false;
+                      });
+
+                      if (order > 1) {
+                          ret.push(['@o', '' + order]);
+                      }
+                  }
+              }
+
+              return ret;
+          };
+        });
+    </script>
 {% endblock %}

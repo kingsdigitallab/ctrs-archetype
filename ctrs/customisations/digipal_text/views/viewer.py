@@ -120,3 +120,55 @@ if 1:
         return ret
 
     viewer.get_all_master_locations = viewer_get_all_master_locations
+
+
+if 1:
+    from digipal import utils as dputils
+
+    def get_elementid_from_xml_element(element, idcount, as_string=False):
+        ''' returns the elementid as a list
+            e.g. [(u'', u'clause'), (u'type', u'disposition')]
+
+            element: an xml element (etree)
+            idcount: a dictionary, new for each enclosing text unit. Used to know
+                which occurrence of an element we are seeing and generate a
+                unique id. E.g. two same titles ('sheriff') marked up in the same
+                way within the same entry => we need a count to differentiate
+                them. We add [@o, 2] to second occurrence, etc.
+        '''
+        from django.utils.text import slugify
+
+        element_text = utils.get_xml_element_text(element)
+
+        # eg. parts: [(u'', u'clause'), (u'type', u'disposition')]
+        parts = [
+            (unicode(re.sub('data-dpt-?', '', k)), unicode(v))
+            for k, v
+            in element.attrib.iteritems()
+            if k.startswith('data-dpt')
+            # CTRS: patch 1
+            and k not in ['data-dpt-cat', 'data-dpt-subtype']
+        ]
+
+        # white list to filter the elements
+        # CTRS: patch 2
+        if parts[0][1] in ('seg'):
+            element_text = slugify(u'%s' % element_text.lower())
+            # CTRS: patch 3
+            if len(element_text) > 0:
+                parts.append(['@text', element_text[:20]])
+        else:
+            parts = None
+
+        if parts:
+            order = dputils.inc_counter(idcount, repr(parts))
+            if order > 1:
+                # add (u'@o', u'2') if it is the 2nd occurence of this
+                # elementid
+                parts.append((u'@o', u'%s' % order))
+
+        return parts
+
+    # monkey patch
+    from digipal_text.views import viewer
+    viewer.get_elementid_from_xml_element = get_elementid_from_xml_element
