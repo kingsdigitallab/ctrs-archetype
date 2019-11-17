@@ -23,3 +23,44 @@
     display: block;
     padding: 0.1em;
 }
+
+.table.table-unsettled thead tr th {
+    position: sticky;
+    top: 0;
+    background-color: #c3ced5;
+    border-bottom: 1px solid grey;
+    z-index: 5;
+}
+
+.table.table-unsettled tr:hover td {
+    background-color: lightyellow;
+}
+
+.table.table-unsettled tr:target td {
+    background-color: lightyellow;
+}
+
+.table.table-unsettled tr td {
+    position: relative;
+}
+
+.line-anchor {
+    min-width: 5rem;
+}
+
+.line-anchor > span {
+    position: absolute;
+    /* GN: trick show selected line below sticky table head */
+    top: -15rem;
+}
+
+.line-anchor > span:target a {
+    font-weight: bold;
+    background-color: yellow;
+}
+
+.line-anchor a {
+    position: absolute;
+    top: 15rem;
+    padding: 0.5rem;
+}

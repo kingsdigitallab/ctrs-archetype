@@ -51,7 +51,7 @@ def view_versions(request, ip_group_id=None):
         })
 
     context['slots'] = range(
-        1, 1 + max([len(tc['regions']) for tc in context['tcs']])
+        max([len(tc['regions']) for tc in context['tcs']])
     )
 
     context['show_numbers'] = 0

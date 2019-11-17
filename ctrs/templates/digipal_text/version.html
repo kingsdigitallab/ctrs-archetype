@@ -17,47 +17,32 @@
         </span>
     </h1>
 
-    {% if 0 %}
-        <div class="row">
+    <table class="table-unsettled table table-striped table-bordered table-condensed">
+      <thead>
+        <tr>
+          <th>#</th>
+          {% for tc in tcs %}
+            <th><a href="{{ tc.ip.get_absolute_url }}texts/view/">{{ tc.ip.display_label }}</a></th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in slots %}
+          <tr>
+            <td class="line-anchor">
+              <span id="L{{forloop.counter}}">
+                <a href="#L{{forloop.counter}}">{{ forloop.counter }}</a>
+              </span>
+            </td>
             {% for tc in tcs %}
-                <div class="col-sm-2 regions">
-                    <div class="heading">
-                        <a href="{{ tc.ip.get_absolute_url }}texts/view/">{{ tc.ip.display_label }}</a>
-                    </div>
-                    {% for region in tc.regions %}
-                        <div id="{{ region.id }}" title="{{ region.content }}"><input type="number">{{ region.content }}</div>
-                    {% endfor %}
-                </div>
+              {% with tc.regions|listget:i as region %}
+                <td id="{{ region.id }}">{{ region.content }}</td>
+              {% endwith %}
             {% endfor %}
-        </div>
-    {% endif %}
-
-    <div class="row">
-        {% if show_numbers %}
-            <div class="col-sm-1 regions">
-                <div class="heading">
-                    &nbsp;
-                </div>
-                <div class="ed">
-                    {% for sn in slots %}
-                        <div >{{ sn }}<br></div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-        {% for tc in tcs %}
-            <div class="col-sm-2 regions">
-                <div class="heading">
-                    <a href="{{ tc.ip.get_absolute_url }}texts/view/">{{ tc.ip.display_label }}</a>
-                </div>
-                <div class="ed">
-                    {% for region in tc.regions %}
-                        <div id="{{ region.id }}" title="{{ region.content }}">{{ region.content }}<br></div>
-                    {% endfor %}
-                </div>
-            </div>
+          </tr>
         {% endfor %}
-    </div>
+      </tbody>
+    </table>
 
 {% endblock %}
 
