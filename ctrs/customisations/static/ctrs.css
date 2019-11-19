@@ -64,3 +64,14 @@
     top: 15rem;
     padding: 0.5rem;
 }
+
+.markup {
+    line-height: 2.2rem;
+}
+
+.markup .unsettled {
+    font-weight: bold;
+    /* border-bottom: 1px solid blue; */
+    color: #448;
+    padding: 0.1rem;
+}

@@ -4,6 +4,8 @@ from mezzanine.core.views import direct_to_template
 from django.contrib import admin
 from customisations.digipal_text import models
 from customisations.digipal_text.views import viewer
+from ctrs.customisations.digipal_text.views import regions as views_ctrs_regions
+
 # from exon.customisations.mapping import models
 
 admin.autodiscover()
@@ -12,25 +14,25 @@ admin.autodiscover()
 # DigiPal URLs
 urlpatterns = None
 
-# dppatterns = patterns(
-#     'exon.customisations.digipal_lab.views',
-#     url(r'^lab/hundreds/$', 'hundreds.view_hundreds'),
-#     url(r'^lab/hands/$', 'hands.view_hands'),
-#     url(r'^lab/codicology/$', 'codicology.view_table'),
-#     url(r'^lab/wordlist/$', 'words.view_list'),
-#     url(r'^lab/viscoll/$', 'viscoll.view_viscoll'),
-#     url(r'^lab/collationdiagrams/$', 'collation_diagrams.view_collation_diagrams'),
-# )
-
 dppatterns = patterns(
-    'ctrs.customisations.digipal_text',
-    url(r'^digipal/versions/(?P<ip_group_id>[^/]+)/?$',
-        'views.genetics.view_versions')
+    '',
+    url(
+        r'^digipal/manuscripts/(?P<ip_group_id>[^/]+)/regions/?$',
+        views_ctrs_regions.view_regions_table,
+        name='regions_table'
+    ),
+    url(
+        r'^ctrs/regions/detect/?$',
+        views_ctrs_regions.view_regions_detect,
+        name='regions_detect'
+    )
 )
 
 # dppatterns += patterns('', ('^', include('digipal.urls')))
 
 dppatterns += patterns('', ('^', include('digipal.urls')))
+
+# dppatterns += [r'^', include('digipal.urls')]
 
 if urlpatterns:
     urlpatterns += dppatterns

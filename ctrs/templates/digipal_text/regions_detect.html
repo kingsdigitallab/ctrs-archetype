@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load html_escape mezzanine_tags  %}
+
+{% block meta_title %}{{ ip_group }}{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}ctrs.css"/>
+{% endblock %}
+
+{% block main %}
+  <h1>Automated regions detection</h1>
+
+  <form action="" method="GET">
+    {% for msid in msids %}
+      <p>
+        <select name="msid-{{ forloop.counter0 }}">
+          {% for ip in ips %}
+            <option value="{{ ip.id }}" {% if ip.id == msid %}selected{% endif %}>{{ ip }} ({{ ip.group }})</option>
+          {% endfor %}
+        </select>
+      </p>
+    {% endfor %}
+    <button type="submit">Compare</button>
+  </form>
+
+  <div class="markup">
+    {{ markedup|safe }}
+  </div>
+
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script>
+        jQuery(document).ready(function($) {
+        });
+    </script>
+{% endblock %}
