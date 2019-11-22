@@ -50,7 +50,8 @@ def view_regions_detect(request):
     context['ips'] = ItemPart.objects.all()
 
     cs = [
-        dputils.get_plain_text_from_html(tcxs[msid]['record'].content) + ' EOT'
+        dputils.get_plain_text_from_html(
+            tcxs[msid]['record'].content) + ' EOT EOT'
         for msid
         in msids
     ]
@@ -67,41 +68,8 @@ def view_regions_detect(request):
     stop_words = ['et', 'de', 'a', 'ac', 'in', 'pro', 'quem', 'aut']
 
     while True:
-        ls = [0, 0]
-        w = None
-        d = 0
-        while True:
-            moved = 0
-            if (ps[0] + ls[0]) < len(cs[0]):
-                ls[0] += 1
-                moved = 1
-            if (ps[1] + ls[1]) < len(cs[1]):
-                ls[1] += 1
-                moved = 1
-
-            if not moved:
-                break
-
-            frags = [c[ps[i]:ps[i] + ls[i]] for i, c in enumerate(cs)]
-            # fragsn = [c[ps[i]:ps[i] + ls[i]] for i, c in enumerate(cs)]
-            inter = set(frags[0]).intersection(frags[1])
-            if sum(ls) > 2:
-                inter = inter.difference(stop_words)
-
-            if inter:
-                w = list(inter)[0]
-                ds = [frags[0].index(w), frags[1].index(w)]
-                skippeds = [frags[0][:ds[0]], frags[1][:ds[1]]]
-
-                # move stop word away from end of the skipped area
-                while all(skippeds) and skippeds[0][-1] == skippeds[1][-1]:
-                    w0 = skippeds[0].pop()
-                    skippeds[1].pop()
-                    w = w0 + ' ' + w
-
-                ps[0] += ds[0] + 1
-                ps[1] += ds[1] + 1
-                break
+        # w, skippeds = get_next_chunk1(ps, cs, stop_words)
+        w, skippeds = get_next_chunk1(ps, cs, stop_words)
 
         if w is None:
             break
@@ -123,6 +91,118 @@ def view_regions_detect(request):
         ur'(\d+)', r'<br><br>(\1)', context['markedup'])
 
     return render(request, 'digipal_text/regions_detect.html', context)
+
+
+def normalise(w):
+    return w.lower().replace('u', 'v')
+
+
+def get_next_chunk2(ps, cs, stop_words):
+    '''
+    Method:
+    We incrementally grow the unsettled regions in both texts cs
+    from positions ps until we find two consecutive tokens.
+
+    One token is at the end of the search string of one text,
+    the other is anywhere inside the search string of the other text.
+
+    This method copes better with large amount of change (e.g. Regiam).
+    But it can be too inclusive and miss important 'anchor' tokens
+    such as the line number or a rare word.
+    '''
+    w = None
+    ls = [1, 1]
+    skippeds = [[], []]
+    while True:
+        moved = 0
+        for i in range(2):
+            if (ps[i] + ls[i]) < len(cs[i]) - 1:
+                ls[i] += 1
+                moved = 1
+
+        if not moved:
+            break
+
+        frags = [c[ps[i]:ps[i] + ls[i]] for i, c in enumerate(cs)]
+
+        if normalise(frags[0][0]) == normalise(frags[1][0]):
+            ps[0] += 1
+            ps[1] += 1
+            return frags[0][0], skippeds
+
+        ds = [0, 0]
+        for i, c in enumerate(cs):
+            w0 = frags[i][-2:]
+            for j in range(len(frags[1 - i]) - 1):
+                if normalise(frags[1 - i][j]) == normalise(w0[0]) and normalise(frags[1 - i][j + 1]) == normalise(w0[1]):
+                    ds[1 - i] = j
+                    ds[i] = len(frags[i]) - 2
+
+                    w = ' '.join(w0)
+
+                    skippeds = [frags[0][:ds[0]], frags[1][:ds[1]]]
+
+                    ps[0] += ds[0] + 2
+                    ps[1] += ds[1] + 2
+
+                    return w, skippeds
+
+    return w, skippeds
+
+
+def get_next_chunk1(ps, cs, stop_words):
+    '''
+    Returns the
+
+    ps: current position in each text, e.g. [1, 4]
+    cs: the tokenised texts, e.g. [['first', 'text'], ['second', 'text']]
+    stop_words: list of frequent words
+
+    Method:
+    We incrementally grow the unsettled regions in both texts cs
+    from positions ps until we find a common token.
+
+    stop_words are not considered as common token because they are too frequent
+    They would otherwise create false positive and disrupt the matching of
+    subsequent regions or even the rest of the texts.
+    '''
+    w = None
+    ls = [0, 0]
+    skippeds = [[], []]
+    while True:
+        moved = 0
+        if (ps[0] + ls[0]) < len(cs[0]) - 1:
+            ls[0] += 1
+            moved = 1
+        if (ps[1] + ls[1]) < len(cs[1]) - 1:
+            ls[1] += 1
+            moved = 1
+
+        if not moved:
+            break
+
+        frags = [c[ps[i]:ps[i] + ls[i]] for i, c in enumerate(cs)]
+        # fragsn = [c[ps[i]:ps[i] + ls[i]] for i, c in enumerate(cs)]
+        inter = set(frags[0]).intersection(frags[1])
+        if sum(ls) > 2:
+            inter = inter.difference(stop_words)
+
+        if inter:
+            w = list(inter)[0]
+            ds = [frags[0].index(w), frags[1].index(w)]
+            skippeds = [frags[0][:ds[0]], frags[1][:ds[1]]]
+
+            # move stop word away from end of the skipped area
+            while all(skippeds) and skippeds[0][-1] == skippeds[1][-1]:
+                w0 = skippeds[0].pop()
+                skippeds[1].pop()
+                w = w0 + ' ' + w
+
+            ps[0] += ds[0] + 1
+            ps[1] += ds[1] + 1
+            break
+
+    return w, skippeds
 
 
 def view_regions_table(request, ip_group_id=None):

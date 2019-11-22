@@ -152,18 +152,21 @@ if 1:
 
         # white list to filter the elements
         # CTRS: patch 2
-        if parts[0][1] in ('seg'):
+        if element.attrib.get('data-dpt-group', '') == 'work':
             element_text = slugify(u'%s' % element_text.lower())
             # CTRS: patch 3
             if len(element_text) > 0:
-                parts.append(['@text', element_text[:20]])
+                text = unicode(element_text[:20])
+            else:
+                text = u'∅'
+            parts.append([u'@text', text])
         else:
             parts = None
 
         if parts:
             order = dputils.inc_counter(idcount, repr(parts))
             if order > 1:
-                # add (u'@o', u'2') if it is the 2nd occurence of this
+                # add (u'@o', u'2') if it is the 2nd occurrence of this
                 # elementid
                 parts.append((u'@o', u'%s' % order))
 
