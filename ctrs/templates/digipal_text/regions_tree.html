@@ -131,7 +131,7 @@
 
             map.addLayer(layer);
 
-            annotations_url = 'http://localhost:8001/digipal/manuscripts/65/texts/image/locus/face/?jx=1&layout=width&width=746&height=0';
+            annotations_url = '/digipal/manuscripts/65/texts/image/locus/face/?jx=1&layout=width&width=746&height=0';
             $.getJSON(annotations_url, function(data) {
                 console.log(data);
                 $.each(data.annotations, function(i, annotation) {
