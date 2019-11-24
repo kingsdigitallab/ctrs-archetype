@@ -50,7 +50,7 @@
 
 .line-anchor > span {
     position: absolute;
-    /* GN: trick show selected line below sticky table head */
+    /* GN: trick to show selected line below sticky table head */
     top: -15rem;
 }
 
@@ -74,4 +74,21 @@
     /* border-bottom: 1px solid blue; */
     color: #448;
     padding: 0.1rem;
+}
+
+ul.form-versions {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.region-index {
+  background-color: lightsteelblue;
+}
+
+tr.region-version {
+  background-color: #eef;
+}
+
+#heatmap {
+  height: 30rem;
 }

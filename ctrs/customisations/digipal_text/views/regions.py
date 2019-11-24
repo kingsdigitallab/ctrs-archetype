@@ -3,7 +3,10 @@ from django.shortcuts import render
 from digipal.models import Text, ItemPart
 from digipal_text.models import TextContentXML, TextContentType
 from digipal import utils as dputils
-
+import re
+from django.utils.text import slugify
+from digipal_text.views import viewer
+import json
 
 def set_context_types_from_request(request, context):
     atypes = TextContentType.objects.all().order_by('id')
@@ -17,6 +20,185 @@ def set_context_types_from_request(request, context):
     context['this_type'] = atype
 
     return atype
+
+
+def view_regions_tree(request):
+    context = {}
+
+    atype = set_context_types_from_request(request, context)
+
+    context['ips_available'] = ItemPart.objects.filter(
+        type__name__iexact='version',
+        group__display_label__iexact='declaration'
+    )
+
+    # ips selected by user
+    context['ips'] = [
+        ip
+        for ip
+        in context['ips_available']
+        if request.GET.get('ip-{}'.format(ip.pk), '')
+    ]
+    if not context['ips']:
+        context['ips'] = context['ips_available']
+
+    class Region(list):
+        pass
+
+    tree = []
+
+    for ip in context['ips']:
+        for i, vregion in enumerate(get_regions_from_version_ip(ip, atype)):
+            if len(tree) <= i:
+                tree.append(Region())
+            tree[i].append(vregion)
+
+    # count the number of unique reading per region
+    for wregion in tree:
+        wreadings = {}
+        for version in wregion:
+            vreadings = {
+                slugify(ms['region']): 1
+                for ms
+                in version['mss']
+            }
+            version['unique_readings'] = len(vreadings)
+            wreadings.update(vreadings)
+        wregion.unique_readings = len(wreadings)
+
+    # generate a dictionary: region-id => degree of unsettledness
+    # that maps with the image annotations drawn with the Text Editor
+
+    regions_value = {}
+
+    # TODO: get all regions from the heatmap
+    idcount = {}
+    tcx = TextContentXML.objects.filter(
+        text_content__item_part__display_label__icontains='heat',
+        text_content__type__slug=atype
+    ).first()
+    content = tcx.content
+    xml = dputils.get_xml_from_unicode(content, ishtml=True, add_root=True)
+    pattern = './/span[@data-dpt-type="unsettled"]'
+    i = 0
+    for element in xml.findall(pattern):
+        is_element_work = element.attrib.get(
+            'data-dpt-group', '').lower() == 'work'
+        if not is_element_work:
+            continue
+
+        rid = ':'.join([
+            pair[1]
+            for pair in viewer.get_elementid_from_xml_element(element, idcount)
+            if pair[0].startswith('@')
+        ])
+
+        if i < len(tree):
+            regions_value[rid] = tree[i].unique_readings
+        else:
+            print(u'WARNING: tree[{}] doesnt exist, {}'.format(i, rid))
+
+        i += 1
+
+    # print(regions_value)
+    context['regions_tree'] = tree
+    context['regions_value'] = json.dumps(regions_value)
+
+    return render(request, 'digipal_text/regions_tree.html', context)
+
+
+def get_regions_from_version_ip(vip, atype):
+    '''
+    vip: the ItemPart for a version-text
+    atype: 'transcription'|'translation'
+
+    Returns all the regions from a version-text.
+    For each region, returns the region as found in the version-text
+    and as found in the participating MSS.
+
+    returns:
+    [
+        {
+            'ip': <ItemPart 'Version 1'>,
+            'region': 'ab [] cd',
+            'mss': [{
+                'ip': <ItemPart 'MS 1'>,
+                'region': 'ab xy cd',
+                },
+                'ip': <ItemPart 'MS 2'>,
+                'region': 'ab pq cd',
+            }],
+        },
+        ...
+    ]
+    '''
+    ret = []
+
+    ips = [vip] + list(vip.subdivisions.all())
+
+    vxml = None
+
+    pattern = './/span[@data-dpt-type="unsettled"]'
+
+    for ip in ips:
+        # get the xml for the Version or MS
+        tcx = TextContentXML.objects.filter(
+            text_content__item_part=ip,
+            text_content__type__slug=atype
+        ).first()
+        content = tcx.content
+
+        xml = dputils.get_xml_from_unicode(content, ishtml=True, add_root=True)
+
+        is_ip_version = vxml is None
+        if is_ip_version:
+            vxml = xml
+        else:
+            # replace all the v-region in vxml with those found in MS xml
+            mregions = [
+                dputils.get_unicode_from_xml(
+                    element, text_only=True, remove_root=True
+                )
+                for element
+                in xml.findall(pattern)
+            ]
+            i = 0
+            for element in vxml.findall(pattern):
+                is_element_work = element.attrib.get(
+                    'data-dpt-group', '').lower() == 'work'
+                if not is_element_work:
+                    tail = element.tail
+                    # element.clear()
+                    element.tail = tail
+                    element.text = ur'[{}]'.format(mregions[i])
+                    # print('H')
+                    # print(element.text)
+                    i += 1
+
+
+        # extract all the w-regions from vxml
+        i = 0
+        for element in vxml.findall(pattern):
+            is_element_work = element.attrib.get(
+                'data-dpt-group', '').lower() == 'work'
+            if not is_element_work:
+                continue
+            text = dputils.get_unicode_from_xml(
+                element, text_only=True, remove_root=True
+            )
+            region = {
+                'region': text,
+                'ip': ip,
+            }
+            # print(i, region)
+            if is_ip_version:
+                region.update({'mss': []})
+                ret.append(region)
+            else:
+                ret[i]['mss'].append(region)
+            i += 1
+
+    return ret
 
 
 def view_regions_detect(request):

@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% load html_escape mezzanine_tags  %}
+
+{% block meta_title %}{{ ip_group }}{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}digipal/openlayers3/ol.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}ctrs.css"/>
+{% endblock %}
+
+{% block main %}
+  <h1>Unsettled regions - Heat map</h1>
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#heatmap" aria-controls="heatmap" role="tab" data-toggle="tab">Heat map</a></li>
+    <li role="presentation"><a href="#regions" aria-controls="regions" role="tab" data-toggle="tab">Regions</a></li>
+    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="heatmap2">
+    </div>
+    <div role="tabpanel" class="tab-pane" id="regions">
+      <div class="regions-tree">
+        <table class="table">
+          {% for wregion in regions_tree %}
+            <tr class="region-index">
+              <td colspan="2">Region {{ forloop.counter }}</td>
+              <td>{{ wregion.unique_readings }}</td>
+            <tr>
+
+            {% for version in wregion %}
+              <tr class="region-version">
+                <td>
+                  {{ version.region }}
+                </td>
+                <td>
+                  {{ version.ip }}
+                </td>
+                <td>
+                  {{ version.unique_readings }}
+                </td>
+              </tr>
+              {% for ms in version.mss %}
+                <tr class="region-ms">
+                  <td>
+                    {{ ms.region }}
+                  </td>
+                  <td>
+                    {{ ms.ip }}
+                  </td>
+                  <td>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% endfor %}
+
+            </div>
+          {% endfor %}
+        </table>
+      </div>
+
+    </div>
+    <div role="tabpanel" class="tab-pane" id="settings">
+      <form class="region-tree-form panel panel-default">
+        <div class="panel-body">
+          <h3>Versions</h3>
+          {% for ip in ips_available %}
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="ip-{{ ip.pk }}" value="1" {% if ip in ips %}checked{% endif %}>
+                {{ ip }}
+              </label>
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+      </form>
+
+    </div>
+
+    <div id="heatmap">
+    </div>
+
+  </div>
+
+
+
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+
+    <script type="text/javascript" src="{{ STATIC_URL }}digipal/openlayers3/ol-debug.js"></script>
+
+    <script>
+        var regions_value = {{ regions_value|safe }};
+
+        var regions_value_max = 0;
+        $.each(regions_value, function(k, v) {
+            if (v > regions_value_max) regions_value_max = v;
+        });
+
+        jQuery(document).ready(function($) {
+          $('#myTabs a').click(function (e) {
+            e.preventDefault()
+            $(this).tab('show')
+          })
+
+          var $map = $('#heatmap');
+          if (1) {
+            var map = window.dputils.add_open_layer({
+                $target: $map,
+                image_url: 'https://mofa-images.dighum.kcl.ac.uk/iip/iipsrv.fcgi?zoomify=ctrs/jp2/nrs/sp13_7.tif/',
+                image_height: 4392,
+                image_width: 3212,
+                zoom: 0,
+                load_tile_callback: function() {},
+                can_rotate: true,
+            });
+
+            var source = new ol.source.Vector({ wrapX: false });
+
+            var layer = new ol.layer.Vector({
+                source: source,
+                // style: get_styles('rgba(255,0,0, 0.4)'),
+            });
+
+            map.addLayer(layer);
+
+            annotations_url = 'http://localhost:8001/digipal/manuscripts/65/texts/image/locus/face/?jx=1&layout=width&width=746&height=0';
+            $.getJSON(annotations_url, function(data) {
+                console.log(data);
+                $.each(data.annotations, function(i, annotation) {
+                    $.each(annotation.geojson.geometry.coordinates[0], function(j, coordinates) {
+                        coordinates[1] -= data.height
+                    });
+
+                    var format = new ol.format.GeoJSON();
+                    var feature = format.readFeature(annotation.geojson);
+
+                    var rid = '';
+                    var is_work = 0;
+                    if (annotation.geojson.properties.elementid) {
+                        $.each(annotation.geojson.properties.elementid, function(j, p) {
+                            if (p[0] == 'group' && p[1] == 'work') is_work = 1;
+                            if (is_work) {
+                              if (p[0] == '@text') rid += p[1];
+                              if (p[0] == '@o') rid += ':' + p[1];
+                            }
+                        });
+                        var region_value = regions_value[rid];
+
+                        if (!region_value) {
+                            console.log('Value not found for', rid, region_value);
+                        }
+
+                        if (region_value > 1) {
+                            // if (regions_value_max > 10) regions_value_max = 10;
+                            regions_value_max = 10;
+                            var change_ratio = (1.0 * (region_value - 1) / (regions_value_max - 1));
+                            if (change_ratio > 1.0) change_ratio = 1.0;
+
+                            console.log(rid, region_value, change_ratio.toFixed(3));
+
+                            // var style = get_opacity_styles_from_ratio(change_ratio);
+                            var style = get_color_styles_from_ratio(change_ratio);
+
+                            feature.setStyle(style);
+
+                            source.addFeature(feature);
+                        }
+                    }
+                });
+            });
+
+            function get_opacity_styles_from_ratio(change_ratio) {
+                var min_opacity = 0.03;
+                var max_opacity = 0.9;
+                var opacity = min_opacity + change_ratio * (max_opacity - min_opacity);
+                if (opacity > max_opacity) opacity = max_opacity;
+                var rgba = 'rgba(255,0,0, '+opacity.toFixed(3)+')';
+                return get_styles_from_rgba(rgba);
+            }
+
+            function get_color_styles_from_ratio(change_ratio) {
+                var colors = [[255, 255, 200], [255, 0, 0]];
+                var opacity = 0.5;
+                rgb = colors[0].map(function(v, i) { return colors[0][i] + (colors[1][i] - colors[0][i]) * change_ratio});
+                var rgba = 'rgba('+rgb.join(',')+', '+opacity+')';
+                return get_styles_from_rgba(rgba);
+            }
+
+            function get_styles_from_rgba(rgba) {
+                // ratio: a value between 0 (low variation) and 1 (high variation)
+                ret = new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: rgba
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: rgba,
+                        width: 1
+                    }),
+                });
+
+                return ret;
+            }
+
+          }
+        });
+    </script>
+{% endblock %}

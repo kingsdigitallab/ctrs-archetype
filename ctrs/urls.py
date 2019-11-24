@@ -25,6 +25,11 @@ dppatterns = patterns(
         r'^ctrs/regions/detect/?$',
         views_ctrs_regions.view_regions_detect,
         name='regions_detect'
+    ),
+    url(
+        r'^ctrs/regions/tree/?$',
+        views_ctrs_regions.view_regions_tree,
+        name='regions_tree'
     )
 )
 
