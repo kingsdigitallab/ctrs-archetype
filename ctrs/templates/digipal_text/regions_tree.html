@@ -26,14 +26,19 @@
     <div role="tabpanel" class="tab-pane" id="regions">
       <div class="regions-tree">
         <table class="table">
+          <label>
+            <input type="checkbox" id="toggle-settled">
+            Show settled regions for selected group of versions.
+          </label>
+
           {% for wregion in regions_tree %}
-            <tr class="region-index">
+            <tr class="region-index {% if wregion.unique_readings == 1 %}settled{%endif%}">
               <td colspan="2">Region {{ forloop.counter }}</td>
               <td>{{ wregion.unique_readings }}</td>
             <tr>
 
             {% for version in wregion %}
-              <tr class="region-version">
+              <tr class="region-version {% if wregion.unique_readings == 1 %}settled{%endif%}">
                 <td>
                   {{ version.region }}
                 </td>
@@ -45,7 +50,7 @@
                 </td>
               </tr>
               {% for ms in version.mss %}
-                <tr class="region-ms">
+                <tr class="region-ms {% if wregion.unique_readings == 1 %}settled{%endif%}">
                   <td>
                     {{ ms.region }}
                   </td>
@@ -105,6 +110,11 @@
         });
 
         jQuery(document).ready(function($) {
+          var $toggle_settled = $('#toggle-settled');
+          $toggle_settled.on('click', function() {
+              $('.settled').toggle($toggle_settled.is(':checked'));
+          });
+
           $('#myTabs a').click(function (e) {
             e.preventDefault()
             $(this).tab('show')

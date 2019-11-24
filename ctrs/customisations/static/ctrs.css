@@ -92,3 +92,7 @@ tr.region-version {
 #heatmap {
   height: 30rem;
 }
+
+.settled {
+  display: none;
+}
