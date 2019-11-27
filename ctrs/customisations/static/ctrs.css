@@ -90,7 +90,8 @@ tr.region-version {
 }
 
 #heatmap {
-  height: 30rem;
+/*  height: 30rem;*/
+    height: 65vh;
 }
 
 .settled {
@@ -120,6 +121,10 @@ a:hover {
 
 #logo {
     color: #3f5564;
+}
+
+nav.primary-nav .navbar-toggle {
+    background: #324450;
 }
 
 .navbar-collapse {
