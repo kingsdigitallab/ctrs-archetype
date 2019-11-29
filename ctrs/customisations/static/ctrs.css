@@ -147,3 +147,13 @@ li.active > a:focus {
 .nav-tabs > li > a:hover {
     border-color: #a7bbc8 #a7bbc8 #a7bbc8;
 }
+
+/* Open Layers */
+
+.ol-control button {
+    background-color: #3f5564;
+}
+
+.ol-control button:hover {
+    background-color: #324450;
+}
