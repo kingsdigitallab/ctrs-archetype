@@ -3,11 +3,13 @@
 
 {% block meta_title %}{{ ip_group }}{% endblock %}
 
+
 {% block extra_css %}
     {{ block.super }}
-    <link rel="stylesheet" href="{{ STATIC_URL }}digipal/openlayers3/ol.css"/>
-    <link rel="stylesheet" href="{{ STATIC_URL }}ctrs.css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}digipal/openlayers3/ol.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}ctrs.css">
 {% endblock %}
+
 
 {% block main %}
   <h1>Unsettled regions - Heat map</h1>

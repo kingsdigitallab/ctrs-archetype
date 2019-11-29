@@ -12,9 +12,6 @@
     overflow: hidden;
 }
 
-.ed {
-}
-
 .ed div {
     border: 1px solid grey;
     margin: 0.1em;
@@ -140,11 +137,11 @@ nav.primary-nav .navbar-toggle {
     background-color: #eee;
 }
 
-.nav-tabs > li.active > a,
-.nav-tabs > li.active > a:hover,
-.nav-tabs > li.active > a:focus {
+li.active > a,
+li.active > a:hover,
+li.active > a:focus {
     color: #f0f0f0;
-    background-color: #3f5564;
+    background-color: #324450 !important;
 }
 
 .nav-tabs > li > a:hover {
