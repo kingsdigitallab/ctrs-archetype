@@ -95,59 +95,6 @@ tr.region-version {
   display: none;
 }
 
-/* GF 26/11/2019: Overrides for local purposes */
-
-a {
-    color: #3f5564;
-}
-
-a:hover {
-    color: #212d35;
-}
-
-.btn-default {
-    border-color: #a7bbc8;
-    color: #3f5564;
-}
-
-.btn-default:hover {
-    background-color: #e6e6e6;
-    border-color: #829db0;
-    color: #3f5564;
-}
-
-#logo {
-    color: #3f5564;
-}
-
-nav.primary-nav .navbar-toggle {
-    background: #324450;
-}
-
-.navbar-collapse {
-    background: linear-gradient(rgba(63,85,100,0.9),rgba(53,72,84,0.9)) !important;
-}
-
-.navbar-default .navbar-nav > li > a:hover {
-    background-color: #324450;
-    color: #f0f0f0;
-}
-
-.nav > li > a:hover {
-    background-color: #eee;
-}
-
-li.active > a,
-li.active > a:hover,
-li.active > a:focus {
-    color: #f0f0f0;
-    background-color: #324450 !important;
-}
-
-.nav-tabs > li > a:hover {
-    border-color: #a7bbc8 #a7bbc8 #a7bbc8;
-}
-
 /* Open Layers */
 
 .ol-control button {
