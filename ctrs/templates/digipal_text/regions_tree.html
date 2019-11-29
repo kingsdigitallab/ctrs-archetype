@@ -141,51 +141,56 @@
 
             map.addLayer(layer);
 
-            annotations_url = '/digipal/manuscripts/65/texts/image/locus/face/?jx=1&layout=width&width=746&height=0';
-            $.getJSON(annotations_url, function(data) {
-                console.log(data);
-                $.each(data.annotations, function(i, annotation) {
-                    $.each(annotation.geojson.geometry.coordinates[0], function(j, coordinates) {
-                        coordinates[1] -= data.height
-                    });
+            annotations_urls = [
+              '/digipal/manuscripts/65/texts/image/locus/face/?jx=1&layout=width&width=746&height=0',
+              '/digipal/manuscripts/71/texts/image/locus/face/?jx=1&layout=width&width=746&height=0',
+            ];
+            for (url of annotations_urls) {
+              $.getJSON(url, function(data) {
+                  console.log(data);
+                  $.each(data.annotations, function(i, annotation) {
+                      $.each(annotation.geojson.geometry.coordinates[0], function(j, coordinates) {
+                          coordinates[1] -= data.height
+                      });
 
-                    var format = new ol.format.GeoJSON();
-                    var feature = format.readFeature(annotation.geojson);
+                      var format = new ol.format.GeoJSON();
+                      var feature = format.readFeature(annotation.geojson);
 
-                    var rid = '';
-                    var is_work = 0;
-                    if (annotation.geojson.properties.elementid) {
-                        $.each(annotation.geojson.properties.elementid, function(j, p) {
-                            if (p[0] == 'group' && p[1] == 'work') is_work = 1;
-                            if (is_work) {
-                              if (p[0] == '@text') rid += p[1];
-                              if (p[0] == '@o') rid += ':' + p[1];
-                            }
-                        });
-                        var region_value = regions_value[rid];
+                      var rid = '';
+                      var is_work = 0;
+                      if (annotation.geojson.properties.elementid) {
+                          $.each(annotation.geojson.properties.elementid, function(j, p) {
+                              if (p[0] == 'group' && p[1] == 'work') is_work = 1;
+                              if (is_work) {
+                                if (p[0] == '@text') rid += p[1];
+                                if (p[0] == '@o') rid += ':' + p[1];
+                              }
+                          });
+                          var region_value = regions_value[rid];
 
-                        if (!region_value) {
-                            console.log('Value not found for', rid, region_value);
-                        }
+                          if (!region_value) {
+                              console.log('Value not found for', rid, region_value);
+                          }
 
-                        if (region_value > 1) {
-                            // if (regions_value_max > 10) regions_value_max = 10;
-                            regions_value_max = 10;
-                            var change_ratio = (1.0 * (region_value - 1) / (regions_value_max - 1));
-                            if (change_ratio > 1.0) change_ratio = 1.0;
+                          if (region_value > 1) {
+                              // if (regions_value_max > 10) regions_value_max = 10;
+                              regions_value_max = 10;
+                              var change_ratio = (1.0 * (region_value - 1) / (regions_value_max - 1));
+                              if (change_ratio > 1.0) change_ratio = 1.0;
 
-                            console.log(rid, region_value, change_ratio.toFixed(3));
+                              console.log(rid, region_value, change_ratio.toFixed(3));
 
-                            // var style = get_opacity_styles_from_ratio(change_ratio);
-                            var style = get_color_styles_from_ratio(change_ratio);
+                              // var style = get_opacity_styles_from_ratio(change_ratio);
+                              var style = get_color_styles_from_ratio(change_ratio);
 
-                            feature.setStyle(style);
+                              feature.setStyle(style);
 
-                            source.addFeature(feature);
-                        }
-                    }
-                });
-            });
+                              source.addFeature(feature);
+                          }
+                      }
+                  });
+              });
+            };
 
             function get_opacity_styles_from_ratio(change_ratio) {
                 var min_opacity = 0.03;
