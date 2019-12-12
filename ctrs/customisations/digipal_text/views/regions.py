@@ -417,18 +417,19 @@ def view_regions_table(request, ip_group_id=None):
 
         regions = []
 
-        xml = dputils.get_xml_from_unicode(content, ishtml=True, add_root=True)
+        if content:
+            xml = dputils.get_xml_from_unicode(content, ishtml=True, add_root=True)
 
-        for element in xml.findall(pattern):
-            is_element_work = element.attrib.get(
-                'data-dpt-group', '').lower() == 'work'
-            if is_group_work != is_element_work:
-                continue
+            for element in xml.findall(pattern):
+                is_element_work = element.attrib.get(
+                    'data-dpt-group', '').lower() == 'work'
+                if is_group_work != is_element_work:
+                    continue
 
-            regions.append({
-                'id': element.attrib['id'],
-                'content': dputils.get_unicode_from_xml(element, text_only=True)
-            })
+                regions.append({
+                    'id': element.attrib['id'],
+                    'content': dputils.get_unicode_from_xml(element, text_only=True)
+                })
 
         context['tcs'].append({
             'ip': tcx.text_content.item_part,

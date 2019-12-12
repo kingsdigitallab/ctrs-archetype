@@ -159,6 +159,9 @@ TextContentXML.convert = TextContentXML_convert
 
 def TextContentXML_save_with_element_ids(self, *args, **kwargs):
 
+    if not self.content:
+        return
+
     # assign an id to all the unsettled elements
     xml = dputils.get_xml_from_unicode(
         self.content, ishtml=True, add_root=True)
