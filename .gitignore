@@ -9,3 +9,4 @@ django_cache
 /ctrs/search
 /ctrs/backups
 /ctrs/app_ctrs_lcl
+venv/
