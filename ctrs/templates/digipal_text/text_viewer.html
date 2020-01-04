@@ -4,9 +4,9 @@
     -
     {% with item_part.group as group %}
         {% if group %}
-          [<a href="{% url 'regions_table' ip_group_id=group.pk %}">{{ group }}</a>]
+          [<a href="{% url 'regions_table' parent_ip_id=group.pk %}">{{ group }}</a>]
         {% else %}
-          [<a href="{% url 'regions_table' ip_group_id=item_part.pk %}">{{ item_part }}</a>]
+          [<a href="{% url 'regions_table' parent_ip_id=item_part.pk %}">{{ item_part }}</a>]
         {% endif %}
     {% endwith %}
 {% endblock %}

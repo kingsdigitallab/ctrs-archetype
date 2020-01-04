@@ -17,7 +17,7 @@ urlpatterns = None
 dppatterns = patterns(
     '',
     url(
-        r'^digipal/manuscripts/(?P<ip_group_id>[^/]+)/regions/?$',
+        r'^digipal/manuscripts/(?P<parent_ip_id>[^/]+)/regions/?$',
         views_ctrs_regions.view_regions_table,
         name='regions_table'
     ),
