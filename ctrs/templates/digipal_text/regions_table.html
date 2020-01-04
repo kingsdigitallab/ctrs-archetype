@@ -22,7 +22,9 @@
         <tr>
           <th>#</th>
           {% for tc in tcs %}
-            <th><a href="{{ tc.ip.get_absolute_url }}texts/view/">{{ tc.ip.display_label }}</a></th>
+            <th><a href="{{ tc.ip.get_absolute_url }}texts/view/?east={{ other_type }}/sync/location/;&center={{ this_type }}/sync/location/;&above=location/locus/face/;">
+              {{ tc.ip.display_label }}
+            </a></th>
           {% endfor %}
         </tr>
       </thead>
