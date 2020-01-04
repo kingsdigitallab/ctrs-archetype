@@ -463,7 +463,7 @@ def get_group_from_parent_ip(parent_ip, atype):
             text_content__item_part=ip,
             text_content__type__slug=atype
         ).first()
-        content = tcx.content
+        content = tcx.content or ''
 
         xml = dputils.get_xml_from_unicode(
             content, ishtml=True, add_root=True
