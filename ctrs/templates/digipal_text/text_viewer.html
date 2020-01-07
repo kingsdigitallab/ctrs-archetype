@@ -26,6 +26,7 @@
 
               var ret = '';
 
+              // ... (ellipsis) was used before to represent an empty region
               if (text.search(/^(\.+|∅)$/i) > -1) {
                   ret = '∅';
               } else {
@@ -87,6 +88,37 @@
 
               return ret;
           };
+
+          document.addEventListener('onContentLoadedInViewer', function(e) {
+            // we scroll the viewer to the element which id is = to url fragment
+            var panel = e.detail;
+            var fragment = window.location.href.replace(/^.*#/, '');
+            if (fragment) {
+                var $content = e.detail.$content;
+                var $el = $content.find('#'+fragment).first();
+                if ($el.length) {
+                    var fontSize = $el.css('font-size');
+                    var lineHeight = Math.floor(parseFloat(fontSize.replace('px','')) * 1.5);
+
+                    $content.scrollTop(
+                        $el.offset().top
+                        - $content.offset().top
+                        - 2 * lineHeight
+                    );
+
+                    if (panel.editingMode != true) {
+                        $el.addClass('highlight');
+                    } 
+                } else if(panel.tinymce) {
+                    // editing mode, we scroll using tinymce
+                    var el = $(panel.tinymce.getBody()).find('#'+fragment).get(0);
+                    if (el) {
+                        el.scrollIntoView();
+                    }
+                }
+            }
+          });
+
         });
     </script>
 {% endblock %}

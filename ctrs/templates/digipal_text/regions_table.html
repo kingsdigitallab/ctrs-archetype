@@ -4,55 +4,76 @@
 {% block meta_title %}{{ ip_parent }}{% endblock %}
 
 {% block extra_css %}
-    {{ block.super }}
-    <link rel="stylesheet" href="{{ STATIC_URL }}ctrs.css"/>
+  {{ block.super }}
+  <link rel="stylesheet" href="{{ STATIC_URL }}ctrs.css"/>
 {% endblock %}
 
 {% block main %}
 
-    <h1>{{ ip_parent }} - Unsettled regions
-        <span>
-            - {{ this_type }}s
-            <a class="dp-small" href="?type={{ other_type }}">(see {{ other_type }}s)</a>
-        </span>
-    </h1>
+  <h1>{{ ip_parent }} - Unsettled regions
+      <span>
+          - {{ this_type }}s
+          <a class="dp-small" href="?type={{ other_type }}">(see {{ other_type }}s)</a>
+      </span>
+  </h1>
 
-    <table class="table-unsettled table table-striped table-bordered table-condensed">
-      <thead>
+  <table class="table-unsettled table table-striped table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>#</th>
+        {% for tc in tcs %}
+          <th><a id="a-{{tc.ip.id}}" href="{{ tc.ip.get_absolute_url }}texts/view/?east={{ other_type }}/sync/location/;&center={{ this_type }}/sync/location/;&above=location/locus/face/;">
+            {{ tc.ip.display_label }}
+          </a></th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in slots %}
         <tr>
-          <th>#</th>
+          <td class="line-anchor">
+            <span id="L{{forloop.counter}}">
+              <a href="#L{{forloop.counter}}">{{ forloop.counter }}</a>
+            </span>
+          </td>
           {% for tc in tcs %}
-            <th><a href="{{ tc.ip.get_absolute_url }}texts/view/?east={{ other_type }}/sync/location/;&center={{ this_type }}/sync/location/;&above=location/locus/face/;">
-              {{ tc.ip.display_label }}
-            </a></th>
+            {% with tc.regions|listget:i as region %}
+              <td id="{{ region.id }}" data-ip="{{ tc.ip.id }}">{{ region.content }}</td>
+            {% endwith %}
           {% endfor %}
         </tr>
-      </thead>
-      <tbody>
-        {% for i in slots %}
-          <tr>
-            <td class="line-anchor">
-              <span id="L{{forloop.counter}}">
-                <a href="#L{{forloop.counter}}">{{ forloop.counter }}</a>
-              </span>
-            </td>
-            {% for tc in tcs %}
-              {% with tc.regions|listget:i as region %}
-                <td id="{{ region.id }}">{{ region.content }}</td>
-              {% endwith %}
-            {% endfor %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <span id="btn-view-rgn">
+    view
+  </span>
 
 {% endblock %}
 
 {% block extra_js %}
-    {{ block.super }}
+  {{ block.super }}
 
-    <script>
-        jQuery(document).ready(function($) {
-        });
-    </script>
+  <script>
+    jQuery(document).ready(function($) {
+      var $btn_view = $('#btn-view-rgn').detach();
+
+      $btn_view.on('click', function(e) {
+        var $td = $(this).parent();
+        var href = $('#a-'+$td.data('ip')).attr('href');
+        href += '#'+$td.attr('id');
+        window.open(href, '_blank');
+      });
+
+      $('.table-unsettled').on('mouseenter mouseleave', 'td', function(e) {
+        var $td = $(this);
+        if (e.type == 'mouseenter') {
+          $td.append($btn_view);
+        } else {
+          $btn_view.detach();
+        }
+      });
+    });
+  </script>
 {% endblock %}

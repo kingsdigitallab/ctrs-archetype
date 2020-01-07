@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-from digipal_text.models import TextContentXML, TextUnits, TextUnit, ClassProperty
-from digipal.utils import re_sub_fct
+from digipal_text.models import TextContentXML
 from digipal import utils as dputils
-from django.db import models
 import regex as re
 
 
@@ -112,7 +110,8 @@ def TextContentXML_convert(self):
 
             subtype = 'data-dpt-subtype="{}"'.format(atype)
 
-            ret = ur'<span data-dpt="seg" data-dpt-type="unsettled" {}>{}</span>'.format(subtype, ret)
+            ret = ur'<span data-dpt="seg" data-dpt-type="unsettled" {}>{}</span>'.format(
+                subtype, ret)
 
             return ret
 
@@ -141,7 +140,8 @@ def TextContentXML_convert(self):
             content
         )
 
-    content = re.sub(ur'<strong>(.*?)</strong>', ur'<span data-dpt="hi" data-dpt-rend="highlight">\1</span>', content)
+    content = re.sub(ur'<strong>(.*?)</strong>',
+                     ur'<span data-dpt="hi" data-dpt-rend="highlight">\1</span>', content)
 
     # (Title) ... | chapter title
     if 1:
@@ -158,15 +158,27 @@ TextContentXML.convert = TextContentXML_convert
 
 
 def TextContentXML_save_with_element_ids(self, *args, **kwargs):
+    '''
+    Add a unique @id attribute to all unsettled regions element in the XML.
+    Convert the ∅ to ⊕ in the MS-text only.
+    '''
 
     if not self.content:
         return
+
+    # 0 if content has not changed (i.e. no need to save)
+    inc = 0
+
+    if self.text_content.item_part.type.name.lower() == 'manuscript':
+        content_new = self.content.replace(u'∅', u'⊕')
+        if content_new != self.content:
+            self.content = content_new
+            inc += 1
 
     # assign an id to all the unsettled elements
     xml = dputils.get_xml_from_unicode(
         self.content, ishtml=True, add_root=True)
 
-    inc = 0
     from datetime import datetime
     now = datetime.utcnow()
     n = (now - datetime(1970, 1, 1)).total_seconds()
