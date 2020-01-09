@@ -3,6 +3,7 @@ from django.conf.urls import patterns, include, url
 from mezzanine.core.views import direct_to_template
 from django.contrib import admin
 from customisations.digipal_text import models
+from customisations.digipal_text import admin as dpcadmin
 from customisations.digipal_text.views import viewer
 from ctrs.customisations.digipal_text.views import regions as views_ctrs_regions
 

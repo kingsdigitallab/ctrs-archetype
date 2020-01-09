@@ -115,9 +115,17 @@ version_field = {
 }
 texts.addField(version_field.copy(), 'url')
 
+siglum = {
+    'key': 'siglum', 'label': 'Siglum',
+    'path': 'text_content.item_part.group_locus',
+    'search': True, 'viewable': True, 'type': 'code',
+    'count': False,
+}
+texts.addField(siglum.copy(), 'url')
+
 ip_display_label = {
     'key': 'text_name', 'label': 'Text',
-    'path': 'text_content.item_part.display_label',
+    'path': 'text_content.item_part.get_ctrs_label',
     'search': True, 'viewable': True, 'type': 'title',
     'count': False,
 }
@@ -131,7 +139,7 @@ text_work_field = {
 }
 texts.addField(text_work_field.copy(), 'url')
 
-# Regiam / Declaration
+# Status
 text_state = {
     'key': 'text_state', 'label': 'Status',
     'path': 'get_state', 'type': 'title', 'search': False,
@@ -151,7 +159,8 @@ texts.options['filter_order'] = [
 ]
 
 texts.options['column_order'] = [
-    'url', 'text_work', 'version',  'text_name', 'text_type', 'text_state'
+    'url', 'text_work', 'siglum', 'version',
+    'text_name', 'text_type', 'text_state'
 ]
 
 texts.options['sorted_fields'] = [

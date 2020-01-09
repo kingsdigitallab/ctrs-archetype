@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from digipal_text.models import TextContentXML
+from digipal.models import ItemPart
 from digipal import utils as dputils
 import regex as re
 
@@ -249,3 +250,17 @@ def TextContentXML_get_state(self):
 
 
 TextContentXML.get_state = TextContentXML_get_state
+
+
+def ItemPart_get_ctrs_label(self):
+    ret = u''
+    if self.current_item and self.current_item.repository:
+        if self.current_item.repository.place:
+            city = self.current_item.repository.place.name
+            if city and city != 'COTR':
+                ret += u'{}, '.format(city)
+    ret += self.display_label
+    return ret
+
+
+ItemPart.get_ctrs_label = ItemPart_get_ctrs_label
