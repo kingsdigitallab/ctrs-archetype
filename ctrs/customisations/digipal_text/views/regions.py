@@ -36,16 +36,20 @@ def view_regions_table(request, parent_ip_id=None):
     atype = set_context_types_from_request(request, context)
 
     for ip, tcx, xml in get_group_from_parent_ip(ip_parent, atype):
-        tcx.save_with_element_ids()
+        tcx.save_with_element_ids(xml)
         regions = []
 
         for element in xml.findall(XPATH_REGION):
             if is_parent_work != is_work_region(element):
                 continue
 
+            region_content = dputils.get_unicode_from_xml(
+                element, text_only=True
+            )
+
             regions.append({
                 'id': element.attrib['id'],
-                'content': dputils.get_unicode_from_xml(element, text_only=True)
+                'content': region_content,
             })
 
         context['tcs'].append({
@@ -165,7 +169,7 @@ def get_regions_from_version_ip(parent_ip, atype):
                 }, {
                 'ip': <ItemPart 'MS 2'>,
                 'region': 'ab pq cd',
-                }, 
+                },
                 # ...
             }],
         },

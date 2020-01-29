@@ -158,28 +158,19 @@ def TextContentXML_convert(self):
 TextContentXML.convert = TextContentXML_convert
 
 
-def TextContentXML_save_with_element_ids(self, *args, **kwargs):
+def TextContentXML_save_with_element_ids(self, xml):
     '''
     Add a unique @id attribute to all unsettled regions element in the XML.
-    Convert the ∅ to ⊕ in the MS-text only.
+    USED TO: Convert the ∅ to ⊕ in the MS-text only.
     '''
 
     if not self.content:
-        return
+        return None
 
     # 0 if content has not changed (i.e. no need to save)
     inc = 0
 
-    if self.text_content.item_part.type.name.lower() == 'manuscript':
-        content_new = self.content.replace(u'∅', u'⊕')
-        if content_new != self.content:
-            self.content = content_new
-            inc += 1
-
     # assign an id to all the unsettled elements
-    xml = dputils.get_xml_from_unicode(
-        self.content, ishtml=True, add_root=True)
-
     from datetime import datetime
     now = datetime.utcnow()
     n = (now - datetime(1970, 1, 1)).total_seconds()
@@ -194,8 +185,10 @@ def TextContentXML_save_with_element_ids(self, *args, **kwargs):
     if inc > 0:
         content = dputils.get_unicode_from_xml(xml, remove_root=True)
         self.content = content
+        print('SAVE')
+        self.save()
 
-        self.save(*args, **kwargs)
+    return xml
 
 
 TextContentXML.save_with_element_ids = TextContentXML_save_with_element_ids
