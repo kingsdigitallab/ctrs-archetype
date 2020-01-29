@@ -16,6 +16,7 @@ from django.template.defaultfilters import slugify
 from time import sleep
 from digipal.management.commands.dpbase import DPBaseCommand
 from digipal_text.models import TextContent, TextContentXML, TextContentType
+from django.db import transaction
 
 
 class Command(DPBaseCommand):
@@ -29,6 +30,16 @@ Commands:
         (work, context, )
 
     drop
+        DELETE all text records.
+
+    swap_symbols
+        Swap the instances of circled-plus and empty symbols in all texts.
+        See ac-118
+
+    resave
+        Save all the text again. Forcing them to go through save() conversions.
+        Helps to convert all entities to utf8 and assign ids.
+
 """
 
     args = 'locus|email'
@@ -79,12 +90,42 @@ Commands:
             self.drop()
             known_command = True
 
+        if command == 'swap_symbols':
+            self.swap_symbols()
+            known_command = True
+
+        if command == 'resave':
+            self.resave()
+            known_command = True
+
         if not known_command:
             print(self.help)
 
     def drop(self):
         for m in [CurrentItem, ItemPart, Text]:
             m.objects.all().delete()
+
+    @transaction.atomic
+    def swap_symbols(self):
+        for tcx in TextContentXML.objects.all():
+            if tcx.content:
+                c0 = tcx.content
+                tcx.content = tcx.content.replace(u'∅', u'#S1#')
+                tcx.content = tcx.content.replace(u'⊕', u'#S2#')
+                tcx.content = tcx.content.replace(u'#S1#', u'⊕')
+                tcx.content = tcx.content.replace(u'#S2#', u'∅')
+                if c0 == tcx.content and len(tcx.content) > 12:
+                    print(
+                        tcx.text_content.item_part.id,
+                        tcx.text_content.item_part,
+                        tcx.id, tcx.text_content.type.name, len(tcx.content)
+                    )
+                tcx.save()
+
+    @transaction.atomic
+    def resave(self):
+        for tcx in TextContentXML.objects.all():
+            tcx.save()
 
     def import_text_meta(self):
         '''

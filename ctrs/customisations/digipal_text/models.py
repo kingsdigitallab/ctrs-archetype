@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from digipal_text.models import TextContentXML
+from digipal_text.models import TextContentXML, TextContentXMLStatus
 from digipal.models import ItemPart
 from digipal import utils as dputils
 import regex as re
@@ -158,14 +158,11 @@ def TextContentXML_convert(self):
 TextContentXML.convert = TextContentXML_convert
 
 
-def TextContentXML_save_with_element_ids(self, xml):
+def add_region_ids_to_xml(xml):
     '''
     Add a unique @id attribute to all unsettled regions element in the XML.
     USED TO: Convert the ∅ to ⊕ in the MS-text only.
     '''
-
-    if not self.content:
-        return None
 
     # 0 if content has not changed (i.e. no need to save)
     inc = 0
@@ -182,16 +179,31 @@ def TextContentXML_save_with_element_ids(self, xml):
             aid = '%0.8x%x' % (n, inc)
             element.attrib['id'] = aid
 
-    if inc > 0:
-        content = dputils.get_unicode_from_xml(xml, remove_root=True)
-        self.content = content
-        print('SAVE')
-        self.save()
-
-    return xml
+    return inc
 
 
-TextContentXML.save_with_element_ids = TextContentXML_save_with_element_ids
+def TextContentXML_save(self, *args, **kwargs):
+    # initialise the status if undefined
+    if not self.status_id:
+        self.status = TextContentXMLStatus.objects.order_by(
+            'sort_order').first()
+    super(TextContentXML, self).save(*args, **kwargs)
+
+    # add a unique @id to each region
+    xml = dputils.get_xml_from_unicode(
+        self.content, ishtml=True, add_root=True)
+    add_region_ids_to_xml(xml)
+
+    # note that after this the entities are converted to utf-8
+    self.content = dputils.get_unicode_from_xml(xml, remove_root=True)
+
+    # save
+    ret = super(TextContentXML, self).save()
+
+    return ret
+
+
+TextContentXML.save = TextContentXML_save
 
 
 def TextContentXML_get_version_label(self):
