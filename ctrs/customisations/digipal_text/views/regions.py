@@ -35,7 +35,7 @@ def view_regions_table(request, parent_ip_id=None):
 
     atype = set_context_types_from_request(request, context)
 
-    for ip, xml in get_group_from_parent_ip(ip_parent, atype):
+    for ip, tcx, xml in get_group_from_parent_ip(ip_parent, atype):
         regions = []
 
         for element in xml.findall(XPATH_REGION):
