@@ -137,7 +137,7 @@ def view_regions_tree(request):
         if i < len(tree):
             regions_value[rid] = tree[i].unique_readings
         else:
-            print(u'WARNING: tree[{}] doesnt exist, {}'.format(i, rid))
+            print(u'WARNING: tree[{}] doesnt exist, {}'.format(i, repr(rid)))
 
         i += 1
 
