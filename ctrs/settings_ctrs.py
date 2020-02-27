@@ -57,8 +57,9 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
         'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<cn>{}</cn>', 'color': '#ffe7bc'},
         'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>', 'color': '#ffe7bc'},
         'btnPageNumber': {'label': 'Locus', 'tei': '<location loctype="locus">{}</location>', 'color': '#ffe7bc'},
+        'btnAuxiliary': {'label': 'Auxiliary sentences', 'tei': '<div type="auxiliary">{}</div>', 'color': '#efffb0', 'triggerName': 'onClickBtnAuxiliary'},
         'btnStructure': {'label': 'Structure', 'buttons': [
-            'btnHeading', 'btnHeadingEmphasised', 'btnChapterNumber', 'btnSentenceNumber', 'btnPageNumber'
+            'btnHeading', 'btnHeadingEmphasised', 'btnChapterNumber', 'btnSentenceNumber', 'btnPageNumber', 'btnAuxiliary'
         ]},
 
         'btnUnsettled': {'label': 'V-Unsettled (shared)', 'tei': '<seg type="unsettled">{}</seg>'},

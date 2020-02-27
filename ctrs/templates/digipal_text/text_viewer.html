@@ -92,8 +92,9 @@
           document.addEventListener('onContentLoadedInViewer', function(e) {
             // we scroll the viewer to the element which id is = to url fragment
             var panel = e.detail;
-            var fragment = window.location.href.replace(/^.*#/, '');
-            if (fragment) {
+            var href = window.location.href;
+            var fragment = href.replace(/^.*#/, '');
+            if (fragment != href) {
                 var $content = e.detail.$content;
                 var $el = $content.find('#'+fragment).first();
                 if ($el.length) {
@@ -108,7 +109,7 @@
 
                     if (panel.editingMode != true) {
                         $el.addClass('highlight');
-                    } 
+                    }
                 } else if(panel.tinymce) {
                     // editing mode, we scroll using tinymce
                     var el = $(panel.tinymce.getBody()).find('#'+fragment).get(0);
@@ -116,6 +117,24 @@
                         el.scrollIntoView();
                     }
                 }
+            }
+          });
+
+          // Text Viewer button for auxiliary div
+          $(window).on('onClickBtnAuxiliary', function(event, editor, definition, utils) {
+            let node = editor.selection.getNode();
+            while (1) {
+              let node_name = node.nodeName.toLowerCase();
+              if (node_name == 'body') break;
+              if (node_name == 'p') {
+                if (node.getAttribute('data-dpt-type')) {
+                  node.removeAttribute('data-dpt-type');
+                } else {
+                  node.setAttribute('data-dpt-type', 'auxiliary');
+                }
+                break;
+              }
+              node = node.parentNode;
             }
           });
 

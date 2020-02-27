@@ -143,3 +143,9 @@
 .mce-content-body span.highlight {
     background: yellow !important;
 }
+
+p[data-dpt-type='auxiliary'] {
+    border: 2px dashed brown;
+    padding: 0.5rem;
+}
+

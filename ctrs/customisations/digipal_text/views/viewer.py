@@ -158,6 +158,8 @@ if 1:
             if len(element_text) > 0:
                 text = unicode(element_text[:20])
             else:
+                print(u'WARNING: slugify {} is empty.'.format(
+                    repr(utils.get_xml_element_text(element))))
                 text = u'∅'
             parts.append([u'@text', text])
         else:
