@@ -187,18 +187,21 @@ def TextContentXML_save(self, *args, **kwargs):
     if not self.status_id:
         self.status = TextContentXMLStatus.objects.order_by(
             'sort_order').first()
-    super(TextContentXML, self).save(*args, **kwargs)
 
-    # add a unique @id to each region
-    xml = dputils.get_xml_from_unicode(
-        self.content, ishtml=True, add_root=True)
-    add_region_ids_to_xml(xml)
+    # TODO: don't call save twice... is that a bug?
+    ret = super(TextContentXML, self).save(*args, **kwargs)
 
-    # note that after this the entities are converted to utf-8
-    self.content = dputils.get_unicode_from_xml(xml, remove_root=True)
+    if self.content:
+        # add a unique @id to each region
+        xml = dputils.get_xml_from_unicode(
+            self.content, ishtml=True, add_root=True)
+        add_region_ids_to_xml(xml)
 
-    # save
-    ret = super(TextContentXML, self).save()
+        # note that after this the entities are converted to utf-8
+        self.content = dputils.get_unicode_from_xml(xml, remove_root=True)
+
+        # save
+        ret = super(TextContentXML, self).save(*args, **kwargs)
 
     return ret
 
