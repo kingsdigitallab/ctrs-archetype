@@ -1,38 +1,17 @@
 # -*- coding: utf-8 -*-
-#from digipal_text.models import *
-from digipal_text.models import TextContentXMLStatus, TextContent, TextContentXML
-import re
-from django.shortcuts import render
-from django.http import HttpResponse, Http404
-from django.db import transaction
-from digipal import utils
-
-# OVERRIDED FUNCTIONS
-
-from digipal_text.views import viewer
-from django.http import HttpRequest
 from collections import OrderedDict
 
-if 0:
+if 1:
+    def update_viewer_context(context, request):
+        context['dd_content_types'].append({
+            'attrs': [['data-class', 'Text']],
+            'icon': 'align-right',
+            'key': 'nonstandardised',
+            'label': 'Non-standardised'
+        })
 
-    base_get_all_master_locations = viewer.get_all_master_locations
-
-    def viewer_get_all_master_locations(context):
-        res = base_get_all_master_locations(context)
-
-        # let's add 'whole' as the first option
-        ret = OrderedDict()
-        if 0:
-            # last option
-            ret = res
-
-        ret['whole'] = ['whole']
-        for k, v in res.items():
-            ret[k] = v
-
-        return ret
-
-    viewer.get_all_master_locations = viewer_get_all_master_locations
+    from digipal_text.views import viewer
+    viewer.update_viewer_context = update_viewer_context
 
 if 1:
     '''
@@ -97,7 +76,8 @@ if 1:
             if not has_specific_location:
                 locations['locus'] = ['face']
                 response['locations'] = OrderedDict(
-                    sorted(locations.items(), key=lambda i: i[0]))
+                    sorted(locations.items(), key=lambda i: i[0])
+                )
 
         ret = resolve_default_location_base(location_type, location, response)
         return ret

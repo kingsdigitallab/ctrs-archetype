@@ -52,19 +52,30 @@ KDL_MAINTAINED = True
 
 TEXT_EDITOR_OPTIONS_CUSTOM = {
     'buttons': {
-        'btnHeading': {'label': 'Heading', 'tei': '<head>{}</head>', 'color': '#efffb0'},
+        'btnHeading': {'label': 'Heading (MS)', 'tei': '<head>{}</head>', 'color': '#efffb0'},
         'btnHeadingEmphasised': {'label': 'Heading (rubricated)', 'tei': '<head rend="emphasised">{}</head>'},
+        'btnSubHeading': {'label': 'Sub-heading', 'tei': '<head type="subheading">{}</head>'},
+        'btnPartNumber': {'label': 'Part Number', 'tei': '<cn type="part">{}</cn>', 'color': '#ffe7bc'},
         'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<cn>{}</cn>', 'color': '#ffe7bc'},
-        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>', 'color': '#ffe7bc'},
         'btnPageNumber': {'label': 'Locus', 'tei': '<location loctype="locus">{}</location>', 'color': '#ffe7bc'},
-        'btnAuxiliary': {'label': 'Auxiliary sentences', 'tei': '<div type="auxiliary">{}</div>', 'color': '#efffb0', 'triggerName': 'onClickBtnAuxiliary'},
-        'btnStructure': {'label': 'Structure', 'buttons': [
-            'btnHeading', 'btnHeadingEmphasised', 'btnChapterNumber', 'btnSentenceNumber', 'btnPageNumber', 'btnAuxiliary'
+
+        'btnDescriptive': {'label': 'Descriptive', 'buttons': [
+            'btnHeading', 'btnHeadingEmphasised', 'btnSubHeading',
+            'btnPartNumber',
+            'btnChapterNumber', 'btnPageNumber',
         ]},
 
-        'btnUnsettled': {'label': 'V-Unsettled (shared)', 'tei': '<seg type="unsettled">{}</seg>'},
-        'btnUnsettledUnique': {'label': 'V-Unsettled (unique)', 'tei': '<seg type="unsettled" subtype="unique">{}</seg>'},
-        'btnWUnsettled': {'label': 'W-Unsettled (shared)', 'tei': '<seg type="unsettled" group="work">{}</seg>'},
+        'btnBlockNumber': {'label': 'Block Number', 'tei': '<cn type="editorial">{}</cn>', 'color': '#ffe7bc'},
+        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>', 'color': '#ffe7bc'},
+        'btnAuxiliary': {'label': 'Auxiliary sentences', 'tei': '<div type="auxiliary">{}</div>', 'color': '#efffb0', 'triggerName': 'onClickBtnAuxiliary'},
+
+        'btnEditorial': {'label': 'Editorial', 'buttons': [
+            'btnBlockNumber', 'btnSentenceNumber',
+            'btnAuxiliary'
+        ]},
+
+        'btnUnsettled': {'label': 'V-Unsettled', 'tei': '<seg type="unsettled">{}</seg>'},
+        'btnWUnsettled': {'label': 'W-Unsettled', 'tei': '<seg type="unsettled" group="work">{}</seg>'},
         'btnGenetic': {'label': 'Dynamics', 'buttons': [
             'btnUnsettled', 'btnUnsettledUnique', 'btnWUnsettled'
         ]},
@@ -77,21 +88,22 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
         'btnRedInk': {'label': 'Red Ink', 'tei': '<hi rend="color(ret)">{}</hi>', 'color': '#ffc9c9'},
         'btnHighlighted': {'label': 'Highlighted', 'tei': '<hi rend="highlight">{}</hi>'},
         'btnSuperscripted': {'label': 'Superscripted', 'tei': '<hi rend="sup">{}</hi>', 'plain': 1},
+        'btnHandShift': {'label': 'New Hand', 'tei': '<newhand>{}</newhand>'},
         'btnScribal': {'label': 'Scribal Intervention', 'buttons': [
             'btnAddedAbove', 'btnAddedInline',
             'btnDeletedStruck', 'btnDeletedErased', 'btnDeletedUnderpointed',
-            'btnRedInk', 'btnHighlighted', 'btnSuperscripted'
+            'btnRedInk', 'btnHighlighted', 'btnSuperscripted',
+            'btnHandShift'
         ]},
 
         'btnVernacular': {'label': 'Vernacular', 'tei': '<seg lang="vernacular">{}</seg>', 'plain': 1},
-        'btnHandShift': {'label': 'New Hand', 'tei': '<newhand>{}</newhand>'},
         'btnOther': {'label': 'Other', 'buttons': [
-            'btnVernacular', 'btnHandShift',
+            'btnVernacular',
         ]},
     },
     'show_highlights_in_preview': 1,
     'toolbars': {
-        'default': 'psclear undo redo pssave | psconvert | btnStructure btnGenetic btnScribal btnOther | code ',
+        'default': 'psclear undo redo pssave | psconvert | btnDescriptive btnEditorial btnGenetic btnScribal btnOther | code ',
     },
     'panels': {
         'north': {
