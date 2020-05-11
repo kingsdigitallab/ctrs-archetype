@@ -2,6 +2,9 @@
 from collections import OrderedDict
 
 if 1:
+    '''
+    We expose nonstandardised content types to the editor.
+    '''
     def update_viewer_context(context, request):
         context['dd_content_types'].append({
             'attrs': [['data-class', 'Text']],

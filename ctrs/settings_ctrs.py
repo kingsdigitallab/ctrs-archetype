@@ -50,14 +50,17 @@ COMPRESS_ENABLED = True
 TEXT_IMAGE_MASTER_CONTENT_TYPE = 'transcription'
 KDL_MAINTAINED = True
 
+TE_COLOR_DESCRIPTIVE = '#ffe7bc'
+TE_COLOR_EDITORIAL = '#bce7ff'
+
 TEXT_EDITOR_OPTIONS_CUSTOM = {
     'buttons': {
-        'btnHeading': {'label': 'Heading (MS)', 'tei': '<head>{}</head>', 'color': '#efffb0'},
+        'btnHeading': {'label': 'Heading (MS)', 'tei': '<head>{}</head>', 'color': TE_COLOR_DESCRIPTIVE},
         'btnHeadingEmphasised': {'label': 'Heading (rubricated)', 'tei': '<head rend="emphasised">{}</head>'},
-        'btnSubHeading': {'label': 'Sub-heading', 'tei': '<head type="subheading">{}</head>'},
-        'btnPartNumber': {'label': 'Part Number', 'tei': '<cn type="part">{}</cn>', 'color': '#ffe7bc'},
-        'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<cn>{}</cn>', 'color': '#ffe7bc'},
-        'btnPageNumber': {'label': 'Locus', 'tei': '<location loctype="locus">{}</location>', 'color': '#ffe7bc'},
+        'btnSubHeading': {'label': 'Sub-heading', 'tei': '<head type="subheading">{}</head>', 'color': TE_COLOR_DESCRIPTIVE},
+        'btnPartNumber': {'label': 'Part Number', 'tei': '<cn type="part">{}</cn>', 'color': TE_COLOR_DESCRIPTIVE},
+        'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<cn>{}</cn>', 'color': TE_COLOR_DESCRIPTIVE},
+        'btnPageNumber': {'label': 'Locus', 'tei': '<location loctype="locus">{}</location>', 'color': TE_COLOR_DESCRIPTIVE},
 
         'btnDescriptive': {'label': 'Descriptive', 'buttons': [
             'btnHeading', 'btnHeadingEmphasised', 'btnSubHeading',
@@ -65,9 +68,9 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
             'btnChapterNumber', 'btnPageNumber',
         ]},
 
-        'btnBlockNumber': {'label': 'Block Number', 'tei': '<cn type="editorial">{}</cn>', 'color': '#ffe7bc'},
-        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>', 'color': '#ffe7bc'},
-        'btnAuxiliary': {'label': 'Auxiliary sentences', 'tei': '<div type="auxiliary">{}</div>', 'color': '#efffb0', 'triggerName': 'onClickBtnAuxiliary'},
+        'btnBlockNumber': {'label': 'Block Number', 'tei': '<cn type="editorial">{}</cn>', 'color': TE_COLOR_EDITORIAL},
+        'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>', 'color': TE_COLOR_EDITORIAL},
+        'btnAuxiliary': {'label': 'Auxiliary sentences', 'tei': '<div type="auxiliary">{}</div>', 'color': TE_COLOR_EDITORIAL, 'triggerName': 'onClickBtnAuxiliary'},
 
         'btnEditorial': {'label': 'Editorial', 'buttons': [
             'btnBlockNumber', 'btnSentenceNumber',

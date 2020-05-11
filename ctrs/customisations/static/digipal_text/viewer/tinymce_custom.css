@@ -26,8 +26,6 @@
 .preview.mce-content-body span[data-dpt=location][data-dpt-loctype=locus]:before,
 .mce-content-body span[data-dpt=sn]:before,
 .preview.mce-content-body span[data-dpt=sn]:before,
-.mce-content-body span[data-dpt=cn]:before,
-.preview.mce-content-body span[data-dpt=cn]:before,
 .mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before,
 .preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before {
     content: '(';
@@ -58,16 +56,6 @@
     content: ')';
 }
 
-.mce-content-body span[data-dpt=cn]:before,
-.preview.mce-content-body span[data-dpt=cn]:before {
-    content: 'c. ';
-}
-
-.mce-content-body span[data-dpt=cn]:after,
-.preview.mce-content-body span[data-dpt=cn]:after {
-    content: '';
-}
-
 .mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique],
 .preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique] {
     font-weight: bold;
@@ -91,20 +79,25 @@
     padding: 2px 1em;
 }
 
-.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work]:before,
-.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work]:before {
-    content: 'W';
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before,
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before {
+    content: 'V';
     position: absolute;
-    margin-top: -1.1em;
-    color: #fd6c23;
-    background: white;
+    margin-top: -0.8em;
+    padding: 0.2em;
+    color: grey;
+    background: background: rgba(255,255,255,0.6);
     font-family: "Arial Black", Gadget, sans-serif;
     font-size: 78%;
     line-height: 1em;
-    padding: 0;
-    margin-left: -1em;
 }
 
+.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work]:before,
+.preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-group=work]:before {
+    content: 'W';
+    color: #fd6c23;
+    margin-left: -1em;
+}
 
 .mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique]:before,
 .preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled][data-dpt-subtype=unique]:before,
@@ -112,7 +105,7 @@
 .preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:before,
 .mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:after,
 .preview.mce-content-body span[data-dpt=seg][data-dpt-type=unsettled]:after {
-    content: '';
+    /* content: ''; */
 }
 
 .mce-content-body span[data-dpt=hi][data-dpt-rend=sup],
