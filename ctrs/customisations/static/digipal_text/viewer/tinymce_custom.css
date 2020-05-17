@@ -86,7 +86,7 @@
     margin-top: -0.8em;
     padding: 0.2em;
     color: grey;
-    background: background: rgba(255,255,255,0.6);
+    background: rgba(255, 255, 255, 0.6);
     font-family: "Arial Black", Gadget, sans-serif;
     font-size: 78%;
     line-height: 1em;
@@ -137,8 +137,30 @@
     background: yellow !important;
 }
 
-p[data-dpt-type='auxiliary'] {
+.mce-content-body span[data-dpt-type='auxiliary'],
+.mce-content-body p[data-dpt-type='auxiliary'] {
     border: 2px dashed brown;
     padding: 0.5rem;
 }
 
+.preview.mce-content-body span[data-dpt-type='auxiliary'],
+.mce-content-body span[data-dpt-type='auxiliary'] {
+    padding: 0.3rem;
+}
+
+.mce-content-body span[data-dpt-type='auxiliary']:before,
+.mce-content-body p[data-dpt-type='auxiliary']:before {
+    font-size: 60%;
+    font-weight: bold;
+    margin-top: -0.9em;
+    background-color: white;
+    position: absolute;
+    content: 'auxiliary';
+    color: brown;
+    font-family: "Arial Black", Gadget, sans-serif;
+}
+
+.mce-content-body p[data-dpt-type='auxiliary']:before {
+    margin-top: -1.4em;
+    font-weight: bold;
+}

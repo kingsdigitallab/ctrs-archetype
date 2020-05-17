@@ -122,21 +122,35 @@
 
           // Text Viewer button for auxiliary div
           $(window).on('onClickBtnAuxiliary', function(event, editor, definition, utils) {
-            let node = editor.selection.getNode();
-            while (1) {
-              let node_name = node.nodeName.toLowerCase();
-              if (node_name == 'body') break;
-              if (node_name == 'p') {
-                if (node.getAttribute('data-dpt-type')) {
-                  node.removeAttribute('data-dpt-type');
-                } else {
-                  node.setAttribute('data-dpt-type', 'auxiliary');
+            let collapsed = editor.selection.isCollapsed();
+
+            if (!collapsed) {
+                options = {
+                    'tag': 'seg',
+                    'attributes': {
+                        'type': 'auxiliary',
+                    }
                 }
-                utils.afterChange();
-                break;
-              }
-              node = node.parentNode;
+                utils.addSpan(options);
+            } else {
+                let node = editor.selection.getNode();
+                while (1) {
+                    let node_name = node.nodeName.toLowerCase();
+                    if (node_name == 'body') break;
+                    if (node_name == 'p') {
+                        if (node.getAttribute('data-dpt-type')) {
+                        node.removeAttribute('data-dpt-type');
+                        } else {
+                        node.setAttribute('data-dpt-type', 'auxiliary');
+                        }
+                        utils.afterChange();
+                        break;
+                    }
+                    node = node.parentNode;
+                }
             }
+            ;
+
           });
 
         });

@@ -56,16 +56,18 @@ TE_COLOR_EDITORIAL = '#bce7ff'
 TEXT_EDITOR_OPTIONS_CUSTOM = {
     'buttons': {
         'btnHeading': {'label': 'Heading (MS)', 'tei': '<head>{}</head>', 'color': TE_COLOR_DESCRIPTIVE},
+        # no longer needed
         'btnHeadingEmphasised': {'label': 'Heading (rubricated)', 'tei': '<head rend="emphasised">{}</head>'},
-        'btnSubHeading': {'label': 'Sub-heading', 'tei': '<head type="subheading">{}</head>', 'color': TE_COLOR_DESCRIPTIVE},
+        'btnSubHeading': {'label': 'Sub-heading (MS)', 'tei': '<head type="subheading">{}</head>', 'color': TE_COLOR_DESCRIPTIVE},
         'btnPartNumber': {'label': 'Part Number', 'tei': '<cn type="part">{}</cn>', 'color': TE_COLOR_DESCRIPTIVE},
         'btnChapterNumber': {'label': 'Chapter Number', 'tei': '<cn>{}</cn>', 'color': TE_COLOR_DESCRIPTIVE},
+        # no longer needed
         'btnPageNumber': {'label': 'Locus', 'tei': '<location loctype="locus">{}</location>', 'color': TE_COLOR_DESCRIPTIVE},
 
         'btnDescriptive': {'label': 'Descriptive', 'buttons': [
-            'btnHeading', 'btnHeadingEmphasised', 'btnSubHeading',
+            'btnHeading', 'btnSubHeading',
             'btnPartNumber',
-            'btnChapterNumber', 'btnPageNumber',
+            'btnChapterNumber',
         ]},
 
         'btnBlockNumber': {'label': 'Block Number', 'tei': '<cn type="editorial">{}</cn>', 'color': TE_COLOR_EDITORIAL},
