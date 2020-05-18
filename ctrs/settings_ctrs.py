@@ -72,7 +72,7 @@ TEXT_EDITOR_OPTIONS_CUSTOM = {
 
         'btnBlockNumber': {'label': 'Block Number', 'tei': '<cn type="editorial">{}</cn>', 'color': TE_COLOR_EDITORIAL},
         'btnSentenceNumber': {'label': 'Sentence Number', 'tei': '<sn>{}</sn>', 'color': TE_COLOR_EDITORIAL},
-        'btnAuxiliary': {'label': 'Auxiliary sentences', 'tei': '<div type="auxiliary">{}</div>', 'color': TE_COLOR_EDITORIAL, 'triggerName': 'onClickBtnAuxiliary'},
+        'btnAuxiliary': {'label': 'Auxiliary', 'tei': '<div type="auxiliary">{}</div>', 'color': TE_COLOR_EDITORIAL, 'triggerName': 'onClickBtnAuxiliary'},
 
         'btnEditorial': {'label': 'Editorial', 'buttons': [
             'btnBlockNumber', 'btnSentenceNumber',
