@@ -188,3 +188,6 @@ texts.options['sorted_fields'] = [
 #
 manuscripts = FacettedType.fromKey('manuscripts')
 manuscripts.options['disabled'] = True
+
+# increased b/c Regiam version are longer
+MAX_FRAGMENT_SIZE = 200000
