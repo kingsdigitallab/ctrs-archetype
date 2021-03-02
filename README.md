@@ -1,5 +1,6 @@
 # ctrs-archetype
-Archetype instance for CoTRS project
+Customised extension of [Archetype](https://github.com/kcl-ddh/digipal) for CoTRS project
+
 https://github.com/kingsdigitallab/ctrs-django
 
 Geoffroy Noel, KDL, 2018-2021
@@ -111,7 +112,7 @@ python build/zip_digipal_project.py
 ```
 
 If the `images` folder in the archive is empty, you'll need to add it
-yourself. The image folder will contain your `jp2` & `originals` folder.
+yourself. The image folder will contain your `ctrs/jp2` & `ctrs/originals` folder.
 To find their locations on the server run the following command and look
 at the first path in the output.
 
@@ -125,3 +126,4 @@ Edit local_settings.py inside the archive and leave only one line:
 from settings_ctrs import *
 ```
 
+Append the ctrs_text folder to the archive.
