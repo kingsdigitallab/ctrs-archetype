@@ -105,7 +105,7 @@ open browser as http://localhost:8000/
 
 Run the following script from your root folder to create an archive
 at ctrs/static/archetype.tar.gz. The archive will contain all the content
-and the project settings & customisations.
+and the project settaings & customisations.
 
 ```
 python build/zip_digipal_project.py 
@@ -127,3 +127,27 @@ from settings_ctrs import *
 ```
 
 Append the ctrs_text folder to the archive.
+
+# Restore the data package into an Archetype Docker container
+
+```
+# download & run archetype (on linux)
+docker stop archetype; docker rm archetype; docker pull kingsdigitallab/archetype:latest; docker run -d --name archetype -v  ~/Documents/Kitematic/archetype/home/digipal/digipal_project:/home/digipal/digipal_project:cached  -p 9080:80 kingsdigitallab/archetype:latest; echo "INSTALLED";
+# open http://localhost:9080/ in your browser
+docker stop archetype
+docker exec -ti archetype bash
+ln -s digipal_project/ctrs_text
+ln -s digipal_project ctrs
+docker stop archetype
+# empty the content of ~/Documents/Kitematic/archetype/home/digipal/digipal_project
+# copy the archive (archetype.tar.gz) inside that folder
+exit
+docker start archetype
+```
+
+```
+# TODO: fix this
+# the domain to the images are hardcoded on the heatmap page
+# Change the following line to localhost:9080
+templates/digipal_text/regions_tree.html:127 
+```
