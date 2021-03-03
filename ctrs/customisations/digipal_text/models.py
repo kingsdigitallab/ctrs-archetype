@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from digipal_text.models import TextContentXML, TextUnits, TextUnit, ClassProperty
-from digipal.utils import re_sub_fct
+from digipal_text.models import TextContentXML, TextContentXMLStatus
+from digipal.models import ItemPart
 from digipal import utils as dputils
-from django.db import models
 import regex as re
 
 
@@ -112,7 +111,8 @@ def TextContentXML_convert(self):
 
             subtype = 'data-dpt-subtype="{}"'.format(atype)
 
-            ret = ur'<span data-dpt="seg" data-dpt-type="unsettled" {}>{}</span>'.format(subtype, ret)
+            ret = ur'<span data-dpt="seg" data-dpt-type="unsettled" {}>{}</span>'.format(
+                subtype, ret)
 
             return ret
 
@@ -141,7 +141,8 @@ def TextContentXML_convert(self):
             content
         )
 
-    content = re.sub(ur'<strong>(.*?)</strong>', ur'<span data-dpt="hi" data-dpt-rend="highlight">\1</span>', content)
+    content = re.sub(ur'<strong>(.*?)</strong>',
+                     ur'<span data-dpt="hi" data-dpt-rend="highlight">\1</span>', content)
 
     # (Title) ... | chapter title
     if 1:
@@ -157,16 +158,16 @@ def TextContentXML_convert(self):
 TextContentXML.convert = TextContentXML_convert
 
 
-def TextContentXML_save_with_element_ids(self, *args, **kwargs):
+def add_region_ids_to_xml(xml):
+    '''
+    Add a unique @id attribute to all unsettled regions element in the XML.
+    USED TO: Convert the ∅ to ⊕ in the MS-text only.
+    '''
 
-    if not self.content:
-        return
+    # 0 if content has not changed (i.e. no need to save)
+    inc = 0
 
     # assign an id to all the unsettled elements
-    xml = dputils.get_xml_from_unicode(
-        self.content, ishtml=True, add_root=True)
-
-    inc = 0
     from datetime import datetime
     now = datetime.utcnow()
     n = (now - datetime(1970, 1, 1)).total_seconds()
@@ -178,14 +179,34 @@ def TextContentXML_save_with_element_ids(self, *args, **kwargs):
             aid = '%0.8x%x' % (n, inc)
             element.attrib['id'] = aid
 
-    if inc > 0:
-        content = dputils.get_unicode_from_xml(xml, remove_root=True)
-        self.content = content
-
-        self.save(*args, **kwargs)
+    return inc
 
 
-TextContentXML.save_with_element_ids = TextContentXML_save_with_element_ids
+def TextContentXML_save(self, *args, **kwargs):
+    # initialise the status if undefined
+    if not self.status_id:
+        self.status = TextContentXMLStatus.objects.order_by(
+            'sort_order').first()
+
+    # TODO: don't call save twice... is that a bug?
+    ret = super(TextContentXML, self).save(*args, **kwargs)
+
+    if self.content:
+        # add a unique @id to each region
+        xml = dputils.get_xml_from_unicode(
+            self.content, ishtml=True, add_root=True)
+        add_region_ids_to_xml(xml)
+
+        # note that after this the entities are converted to utf-8
+        self.content = dputils.get_unicode_from_xml(xml, remove_root=True)
+
+        # save
+        ret = super(TextContentXML, self).save(*args, **kwargs)
+
+    return ret
+
+
+TextContentXML.save = TextContentXML_save
 
 
 def TextContentXML_get_version_label(self):
@@ -237,3 +258,17 @@ def TextContentXML_get_state(self):
 
 
 TextContentXML.get_state = TextContentXML_get_state
+
+
+def ItemPart_get_ctrs_label(self):
+    ret = u''
+    if self.current_item and self.current_item.repository:
+        if self.current_item.repository.place:
+            city = self.current_item.repository.place.name
+            if city and city != 'COTR':
+                ret += u'{}, '.format(city)
+    ret += self.display_label
+    return ret
+
+
+ItemPart.get_ctrs_label = ItemPart_get_ctrs_label

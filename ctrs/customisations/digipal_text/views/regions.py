@@ -1,28 +1,74 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
-from digipal.models import Text, ItemPart
+from digipal.models import ItemPart
 from digipal_text.models import TextContentXML, TextContentType
 from digipal import utils as dputils
-import re
 from django.utils.text import slugify
 from digipal_text.views import viewer
 import json
 
-def set_context_types_from_request(request, context):
-    atypes = TextContentType.objects.all().order_by('id')
+# the xpath to find unsettled regions in the XML
+XPATH_REGION = './/span[@data-dpt-type="unsettled"]'
 
-    default_type = atypes[0].slug
-    atype = request.GET.get('type', default_type)
-    other_type = atypes[1].slug
-    if atype == other_type:
-        other_type = default_type
-    context['other_type'] = other_type
-    context['this_type'] = atype
 
-    return atype
+def view_regions_table(request, parent_ip_id=None):
+    '''
+    Returns data to display a table used by project team editors
+    to verify that the mark up matches across all XMLs.
+
+    parent_ip_id = the id of the parent ItemPart (Version or Work)
+    It will be shown in the first column, subsequent columns are for the
+    children itempart.
+
+    Two cases:
+    a) the parent is a Version and children are MS-Texts
+    b) the parent is a Work and the children are Versions
+    '''
+    context = {
+        'wide_page': True,
+    }
+
+    ip_parent = ItemPart.objects.filter(id=parent_ip_id).first()
+    context['ip_parent'] = ip_parent
+    context['tcs'] = []
+    is_parent_work = ip_parent.type.name.lower() == 'work'
+
+    atype = set_context_types_from_request(request, context)
+
+    for ip, tcx, xml in get_group_from_parent_ip(ip_parent, atype):
+        regions = []
+
+        for element in xml.findall(XPATH_REGION):
+            if is_parent_work != is_work_region(element):
+                continue
+
+            region_content = dputils.get_unicode_from_xml(
+                element, text_only=True
+            )
+
+            regions.append({
+                'id': element.attrib['id'],
+                'content': region_content,
+            })
+
+        context['tcs'].append({
+            'ip': ip,
+            'regions': regions
+        })
+
+    context['slots'] = range(
+        max([len(tc['regions']) for tc in context['tcs']])
+    )
+
+    return render(request, 'digipal_text/regions_table.html', context)
 
 
 def view_regions_tree(request):
+    '''
+    Returns a list of regions for the Versions selected by the users.
+    For each region, returns statistics and values taken by each
+    version.
+    '''
     context = {}
 
     atype = set_context_types_from_request(request, context)
@@ -34,9 +80,7 @@ def view_regions_tree(request):
 
     # ips selected by user
     context['ips'] = [
-        ip
-        for ip
-        in context['ips_available']
+        ip for ip in context['ips_available']
         if request.GET.get('ip-{}'.format(ip.pk), '')
     ]
     if not context['ips']:
@@ -47,8 +91,8 @@ def view_regions_tree(request):
 
     tree = []
 
-    for ip in context['ips']:
-        for i, vregion in enumerate(get_regions_from_version_ip(ip, atype)):
+    for vip in context['ips']:
+        for i, vregion in enumerate(get_regions_from_version_ip(vip, atype)):
             if len(tree) <= i:
                 tree.append(Region())
             tree[i].append(vregion)
@@ -79,12 +123,9 @@ def view_regions_tree(request):
     ).first()
     content = tcx.content
     xml = dputils.get_xml_from_unicode(content, ishtml=True, add_root=True)
-    pattern = './/span[@data-dpt-type="unsettled"]'
     i = 0
-    for element in xml.findall(pattern):
-        is_element_work = element.attrib.get(
-            'data-dpt-group', '').lower() == 'work'
-        if not is_element_work:
+    for element in xml.findall(XPATH_REGION):
+        if not is_work_region(element):
             continue
 
         rid = ':'.join([
@@ -96,7 +137,7 @@ def view_regions_tree(request):
         if i < len(tree):
             regions_value[rid] = tree[i].unique_readings
         else:
-            print(u'WARNING: tree[{}] doesnt exist, {}'.format(i, rid))
+            print(u'WARNING: tree[{}] doesnt exist, {}'.format(i, repr(rid)))
 
         i += 1
 
@@ -107,14 +148,14 @@ def view_regions_tree(request):
     return render(request, 'digipal_text/regions_tree.html', context)
 
 
-def get_regions_from_version_ip(vip, atype):
+def get_regions_from_version_ip(parent_ip, atype):
     '''
-    vip: the ItemPart for a version-text
+    parent_ip: ItemPart of a Version-Text
     atype: 'transcription'|'translation'
 
-    Returns all the regions from a version-text.
-    For each region, returns the region as found in the version-text
-    and as found in the participating MSS.
+    Returns all the regions from the parent document.
+    For each region, returns the region as found in the parent and direct
+    children.
 
     returns:
     [
@@ -124,64 +165,54 @@ def get_regions_from_version_ip(vip, atype):
             'mss': [{
                 'ip': <ItemPart 'MS 1'>,
                 'region': 'ab xy cd',
-                },
+                }, {
                 'ip': <ItemPart 'MS 2'>,
                 'region': 'ab pq cd',
+                },
+                # ...
             }],
         },
-        ...
+        # next region in <ItemPart 'Version 1'>
     ]
     '''
     ret = []
 
-    ips = [vip] + list(vip.subdivisions.all())
+    # the parent text, also used as a XML canvas
+    pxml = None
 
-    vxml = None
-
-    pattern = './/span[@data-dpt-type="unsettled"]'
-
-    for ip in ips:
-        # get the xml for the Version or MS
-        tcx = TextContentXML.objects.filter(
-            text_content__item_part=ip,
-            text_content__type__slug=atype
-        ).first()
-        content = tcx.content
-
-        xml = dputils.get_xml_from_unicode(content, ishtml=True, add_root=True)
-
-        is_ip_version = vxml is None
-        if is_ip_version:
-            vxml = xml
+    for ip, tcx, xml in get_group_from_parent_ip(parent_ip, atype):
+        is_ip_parent = pxml is None
+        if is_ip_parent:
+            pxml = xml
         else:
-            # replace all the v-region in vxml with those found in MS xml
+            # replace all the v-regions in pxml with those found in child xml
+
+            # collect all child regions
             mregions = [
                 dputils.get_unicode_from_xml(
                     element, text_only=True, remove_root=True
                 )
                 for element
-                in xml.findall(pattern)
+                in xml.findall(XPATH_REGION)
             ]
+
+            # replace the v-regions only in the canvas / pxml
             i = 0
-            for element in vxml.findall(pattern):
-                is_element_work = element.attrib.get(
-                    'data-dpt-group', '').lower() == 'work'
-                if not is_element_work:
+            for element in pxml.findall(XPATH_REGION):
+                if not is_work_region(element):
+                    region_text = 'MISSING'
+                    if i < len(mregions):
+                        region_text = mregions[i]
+
                     tail = element.tail
-                    # element.clear()
                     element.tail = tail
-                    element.text = ur'[{}]'.format(mregions[i])
-                    # print('H')
-                    # print(element.text)
+                    element.text = ur'[{}]'.format(region_text)
                     i += 1
 
-
-        # extract all the w-regions from vxml
+        # extract all the w-regions from pxml
         i = 0
-        for element in vxml.findall(pattern):
-            is_element_work = element.attrib.get(
-                'data-dpt-group', '').lower() == 'work'
-            if not is_element_work:
+        for element in pxml.findall(XPATH_REGION):
+            if not is_work_region(element):
                 continue
             text = dputils.get_unicode_from_xml(
                 element, text_only=True, remove_root=True
@@ -191,7 +222,7 @@ def get_regions_from_version_ip(vip, atype):
                 'ip': ip,
             }
             # print(i, region)
-            if is_ip_version:
+            if is_ip_parent:
                 region.update({'mss': []})
                 ret.append(region)
             else:
@@ -202,6 +233,10 @@ def get_regions_from_version_ip(vip, atype):
 
 
 def view_regions_detect(request):
+    '''
+    Experimental view to automatically find unsettled regions
+    among a list of texts by comparing their content.
+    '''
 
     print('-' * 40)
 
@@ -387,59 +422,56 @@ def get_next_chunk1(ps, cs, stop_words):
     return w, skippeds
 
 
-def view_regions_table(request, ip_group_id=None):
-    context = {
-        'wide_page': True,
-    }
+def is_work_region(element):
+    '''
+    Returns True if the given element is a W-region.
+    As opposed to a V-region.
 
-    ip_group = ItemPart.objects.filter(id=ip_group_id).first()
-    context['ip_group'] = ip_group
-    context['tcs'] = []
-    slots_count = 0
+    element: a ElementTree Element instance (i.e. an XML Element)
+    '''
+    return element.attrib.get('data-dpt-group', '').lower() == 'work'
 
-    atype = set_context_types_from_request(request, context)
 
-    # text content xmls
-    tcxs = TextContentXML.objects.filter(
-        text_content__item_part__group=ip_group, text_content__type__slug=atype
-    ).order_by('text_content__item_part__display_label')
-    ip_group_tcxs = TextContentXML.objects.filter(
-        text_content__item_part=ip_group, text_content__type__slug=atype
-    ).order_by('text_content__item_part__display_label')
+def set_context_types_from_request(request, context=None):
+    atypes = TextContentType.objects.all().order_by('id')
 
-    is_group_work = ip_group.type.name.lower() == 'work'
+    default_type = atypes[0].slug
+    atype = request.GET.get('type', default_type)
+    other_type = atypes[1].slug
+    if atype == other_type:
+        other_type = default_type
 
-    pattern = './/span[@data-dpt-type="unsettled"]'
+    if context is not None:
+        context['other_type'] = other_type
+        context['this_type'] = atype
 
-    for tcx in list(ip_group_tcxs) + list(tcxs):
-        tcx.save_with_element_ids()
-        content = tcx.content
+    return atype
 
-        regions = []
 
-        if content:
-            xml = dputils.get_xml_from_unicode(content, ishtml=True, add_root=True)
-
-            for element in xml.findall(pattern):
-                is_element_work = element.attrib.get(
-                    'data-dpt-group', '').lower() == 'work'
-                if is_group_work != is_element_work:
-                    continue
-
-                regions.append({
-                    'id': element.attrib['id'],
-                    'content': dputils.get_unicode_from_xml(element, text_only=True)
-                })
-
-        context['tcs'].append({
-            'ip': tcx.text_content.item_part,
-            'regions': regions
-        })
-
-    context['slots'] = range(
-        max([len(tc['regions']) for tc in context['tcs']])
+def get_group_from_parent_ip(parent_ip, atype):
+    '''
+    Returns a list of entries.
+    Each entry correspond to a text.
+    The first entry is for the parent_ip.
+    The following ones are for the children of the parent.
+    Each entry is [ip, tcx, xml]
+    Where ip is an ItemPart. tcx a TextContentXML and xml an ElementTree
+    '''
+    ips = [parent_ip] + list(
+        parent_ip.subdivisions.all().order_by('display_label')
     )
 
-    context['show_numbers'] = 0
+    for ip in ips:
+        tcx = TextContentXML.objects.filter(
+            text_content__item_part=ip,
+            text_content__type__slug=atype
+        ).first()
+        content = ' '
+        if tcx:
+            content = tcx.content or ' '
 
-    return render(request, 'digipal_text/regions_table.html', context)
+        xml = dputils.get_xml_from_unicode(
+            content, ishtml=True, add_root=True
+        )
+
+        yield ip, tcx, xml

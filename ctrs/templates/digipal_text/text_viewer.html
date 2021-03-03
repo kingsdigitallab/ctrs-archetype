@@ -4,9 +4,9 @@
     -
     {% with item_part.group as group %}
         {% if group %}
-          [<a href="{% url 'regions_table' ip_group_id=group.pk %}">{{ group }}</a>]
+          [<a href="{% url 'regions_table' parent_ip_id=group.pk %}">{{ group }}</a>]
         {% else %}
-          [<a href="{% url 'regions_table' ip_group_id=item_part.pk %}">{{ item_part }}</a>]
+          [<a href="{% url 'regions_table' parent_ip_id=item_part.pk %}">{{ item_part }}</a>]
         {% endif %}
     {% endwith %}
 {% endblock %}
@@ -26,6 +26,7 @@
 
               var ret = '';
 
+              // ... (ellipsis) was used before to represent an empty region
               if (text.search(/^(\.+|∅)$/i) > -1) {
                   ret = '∅';
               } else {
@@ -87,6 +88,71 @@
 
               return ret;
           };
+
+          document.addEventListener('onContentLoadedInViewer', function(e) {
+            // we scroll the viewer to the element which id is = to url fragment
+            var panel = e.detail;
+            var href = window.location.href;
+            var fragment = href.replace(/^.*#/, '');
+            if (fragment != href) {
+                var $content = e.detail.$content;
+                var $el = $content.find('#'+fragment).first();
+                if ($el.length) {
+                    var fontSize = $el.css('font-size');
+                    var lineHeight = Math.floor(parseFloat(fontSize.replace('px','')) * 1.5);
+
+                    $content.scrollTop(
+                        $el.offset().top
+                        - $content.offset().top
+                        - 2 * lineHeight
+                    );
+
+                    if (panel.editingMode != true) {
+                        $el.addClass('highlight');
+                    }
+                } else if(panel.tinymce) {
+                    // editing mode, we scroll using tinymce
+                    var el = $(panel.tinymce.getBody()).find('#'+fragment).get(0);
+                    if (el) {
+                        el.scrollIntoView();
+                    }
+                }
+            }
+          });
+
+          // Text Viewer button for auxiliary div
+          $(window).on('onClickBtnAuxiliary', function(event, editor, definition, utils) {
+            let collapsed = editor.selection.isCollapsed();
+
+            if (!collapsed) {
+                options = {
+                    'tag': 'seg',
+                    'attributes': {
+                        'type': 'auxiliary',
+                    }
+                }
+                utils.addSpan(options);
+            } else {
+                let node = editor.selection.getNode();
+                while (1) {
+                    let node_name = node.nodeName.toLowerCase();
+                    if (node_name == 'body') break;
+                    if (node_name == 'p') {
+                        if (node.getAttribute('data-dpt-type')) {
+                        node.removeAttribute('data-dpt-type');
+                        } else {
+                        node.setAttribute('data-dpt-type', 'auxiliary');
+                        }
+                        utils.afterChange();
+                        break;
+                    }
+                    node = node.parentNode;
+                }
+            }
+            ;
+
+          });
+
         });
     </script>
 {% endblock %}
